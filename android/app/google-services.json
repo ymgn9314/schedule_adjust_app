@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "500668166186",
+    "project_id": "high-hat",
+    "storage_bucket": "high-hat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500668166186:android:c037773e600e39f3671353",
+        "android_client_info": {
+          "package_name": "jp.ymgn.high_hat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500668166186-1uo23ii3t5et1rs9ifk8cp1msqmn8ihr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEAM62ghle3UuAmyektdRdvuRZ6EVy2_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500668166186-1uo23ii3t5et1rs9ifk8cp1msqmn8ihr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "500668166186-6029k06nebl5l8cu6jnqjt5pt42gjrs1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "jp.ymgn.highHat"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
