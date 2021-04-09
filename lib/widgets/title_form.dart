@@ -1,7 +1,5 @@
 // 題名入力フォーム
 import 'package:flutter/material.dart';
-import 'package:high_hat/util/input_field_validator.dart';
-
 import 'form_base.dart';
 
 class TitleForm extends FormBase {
