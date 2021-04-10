@@ -3,15 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:high_hat/util/show_cupertino_date_picker.dart';
 import 'package:intl/intl.dart';
 
-import 'form_base.dart';
-
-class DeadlineForm extends FormBase {
-  DeadlineForm({required BuildContext inheritedContext})
-      : super(
-          inheritedContext: inheritedContext,
-          formType: elementType.deadline,
-        );
-
+class DeadlineForm extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   String get content => _controller.text;
 
@@ -21,20 +13,17 @@ class DeadlineForm extends FormBase {
       controller: _controller,
       decoration: InputDecoration(
         labelText: '締め切り日時',
-        // border: OutlineInputBorder(
-        //   borderRadius: BorderRadius.circular(20),
-        // ),
-        suffixIcon: calendarIconButton(),
+        suffixIcon: calendarIconButton(context),
       ),
     );
   }
 
-  Widget calendarIconButton() {
+  Widget calendarIconButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.calendar_today_outlined),
       onPressed: () async {
         // Cupertinoの日付ポップアップを表示する
-        DateTime? datetime = await showCupertinoDatePicker(inheritedContext);
+        final datetime = await showCupertinoDatePicker(context);
         // 日付が選択されていたらフォームを更新する
         if (datetime != null) {
           final formattedDateTime =

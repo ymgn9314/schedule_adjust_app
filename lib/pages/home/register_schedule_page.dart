@@ -13,8 +13,7 @@ class RegisterSchedulePage extends StatelessWidget {
       builder: (context, _) {
         // フォームを初期化する(ビルドが終わった後に初期化を実行したいので、遅延させる)
         Future.delayed(Duration.zero, () {
-          final controller = context.read<RegisterScheduleController>();
-          controller
+          context.read<RegisterScheduleController>()
             ..context = context
             ..initForm();
         });

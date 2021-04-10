@@ -1,14 +1,7 @@
 // 題名入力フォーム
 import 'package:flutter/material.dart';
-import 'form_base.dart';
 
-class TitleForm extends FormBase {
-  TitleForm({required BuildContext inheritedContext})
-      : super(
-          inheritedContext: inheritedContext,
-          formType: elementType.title,
-        );
-
+class TitleForm extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   String get content => _controller.text;
 

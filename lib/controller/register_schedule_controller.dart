@@ -24,10 +24,9 @@ class RegisterScheduleController extends ChangeNotifier {
   set context(BuildContext? context) => _context = context;
 
   void initForm() {
-    titleForm = TitleForm(inheritedContext: _context!);
-    deadlineForm = DeadlineForm(inheritedContext: _context!);
-    candidateDatesForm = CandidateDatesForm(inheritedContext: _context!);
-    // candidateDateList = [AddCandidateDateComponent()];
+    titleForm = TitleForm();
+    deadlineForm = DeadlineForm();
+    candidateDatesForm = CandidateDatesForm();
     // 初期化完了
     isInitialized = true;
     notifyListeners();
@@ -41,13 +40,11 @@ class RegisterScheduleController extends ChangeNotifier {
   // 予定を登録
   void registerScheduleAndPopNavigation() {
     // AppDataControllerに予定を登録する
-    final controller = _context!.read<ScheduleDataController>();
-    controller.add(
-      titleForm: titleForm,
-      deadlineForm: deadlineForm,
-      candidateDatesForm: candidateDatesForm,
-    );
-
+    _context!.read<ScheduleDataController>().add(
+          titleForm: titleForm,
+          deadlineForm: deadlineForm,
+          candidateDatesForm: candidateDatesForm,
+        );
     Navigator.of(_context!).pop();
 
     // notifyListeners();はcontroller.add()内で行っているので不要

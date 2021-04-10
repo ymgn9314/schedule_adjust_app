@@ -5,31 +5,24 @@ import 'package:high_hat/util/show_cupertino_date_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import 'form_base.dart';
-
-class CandidateDatesForm extends FormBase {
-  CandidateDatesForm({required BuildContext inheritedContext})
-      : super(
-          inheritedContext: inheritedContext,
-          formType: elementType.candidateDay,
-        );
-
+class CandidateDatesForm extends StatelessWidget {
   // 候補日一覧リスト
   List<Widget> candidateDateList = [AddCandidateDateComponent()];
 
   // 候補日を追加
-  void addCandidateDate(DateTime datetime) {
+  void addCandidateDate(BuildContext context, DateTime datetime) {
     candidateDateList.insert(
       candidateDateList.length - 1,
       CandidateDateComponent(datetime),
     );
-    inheritedContext.read<RegisterScheduleController>().callNotifyListeners();
+    context.read<RegisterScheduleController>().callNotifyListeners();
   }
 
   // 候補日を削除
-  void deleteCandidateDate(CandidateDateComponent component) {
+  void deleteCandidateDate(
+      BuildContext context, CandidateDateComponent component) {
     candidateDateList.remove(component);
-    inheritedContext.read<RegisterScheduleController>().callNotifyListeners();
+    context.read<RegisterScheduleController>().callNotifyListeners();
   }
 
   @override
@@ -48,8 +41,6 @@ class CandidateDatesForm extends FormBase {
             builder: (context, length, child) {
               return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  // mainAxisSpacing: 4,
-                  // crossAxisSpacing: 4,
                   crossAxisCount: 2,
                   childAspectRatio: 5,
                 ),
@@ -70,8 +61,8 @@ class CandidateDatesForm extends FormBase {
 
 // 候補日コンポーネント(単一の候補日パーツ)
 class CandidateDateComponent extends StatelessWidget {
-  CandidateDateComponent(this._dateTime);
-  DateTime _dateTime;
+  const CandidateDateComponent(this._dateTime);
+  final DateTime _dateTime;
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +79,7 @@ class CandidateDateComponent extends StatelessWidget {
       onDeleted: () {
         // ×ボタンが押されたら候補日を削除する
         final controller = context.read<RegisterScheduleController>();
-        controller.candidateDatesForm.deleteCandidateDate(this);
+        controller.candidateDatesForm.deleteCandidateDate(context, this);
       },
     );
   }
@@ -106,7 +97,7 @@ class AddCandidateDateComponent extends StatelessWidget {
         final datetime = await showCupertinoDatePicker(context);
         // 日付が選択されていたらフォームを更新する
         if (datetime != null) {
-          controller.candidateDatesForm.addCandidateDate(datetime);
+          controller.candidateDatesForm.addCandidateDate(context, datetime);
         }
       },
     );
