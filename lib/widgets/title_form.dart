@@ -1,6 +1,6 @@
-// 題名入力フォーム
 import 'package:flutter/material.dart';
 
+// 題名入力フォーム
 class TitleForm extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   String get content => _controller.text;

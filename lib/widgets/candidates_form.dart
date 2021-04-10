@@ -1,10 +1,10 @@
-// 候補日一覧フォーム
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/register_schedule_controller.dart';
 import 'package:high_hat/util/show_cupertino_date_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+// 候補日一覧フォーム
 class CandidateDatesForm extends StatelessWidget {
   // 候補日一覧リスト
   List<Widget> candidateDateList = [AddCandidateDateComponent()];

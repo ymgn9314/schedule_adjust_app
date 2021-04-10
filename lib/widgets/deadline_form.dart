@@ -1,8 +1,8 @@
-// 締め切りフォーム
 import 'package:flutter/material.dart';
 import 'package:high_hat/util/show_cupertino_date_picker.dart';
 import 'package:intl/intl.dart';
 
+// 締め切りフォーム
 class DeadlineForm extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   String get content => _controller.text;
