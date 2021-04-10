@@ -10,12 +10,13 @@ class SchedulePage extends StatelessWidget {
     print('SchedulePage#build()');
 
     return Scaffold(
-      body: Consumer<ScheduleDataController>(
-        builder: (context, model, child) {
+      body: Selector<ScheduleDataController, int>(
+        selector: (context, model) => model.scheduleList.length,
+        builder: (context, length, child) {
           return ListView.builder(
-            itemCount: model.scheduleList.length,
+            itemCount: length,
             itemBuilder: (context, index) {
-              return model.scheduleList[index];
+              return context.read<ScheduleDataController>().scheduleList[index];
             },
           );
         },
