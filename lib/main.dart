@@ -11,25 +11,6 @@ import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:provider/provider.dart';
 import 'pages/Login/login_check_page.dart';
 
-final ThemeData myLightTheme = ThemeData(
-  brightness: Brightness.light,
-  primarySwatch: Colors.orange,
-  primaryColor: Colors.orange[500],
-  primaryColorBrightness: Brightness.light,
-  accentColor: Colors.orangeAccent, // Colors.pink[200],
-  accentColorBrightness: Brightness.light,
-  buttonColor: Colors.orange[50],
-);
-
-final ThemeData myDarkTheme = ThemeData(
-  brightness: Brightness.dark,
-  primarySwatch: Colors.green,
-  primaryColor: Colors.green[500],
-  primaryColorBrightness: Brightness.dark,
-  accentColor: Colors.green[800], // Colors.yellow[200],
-  accentColorBrightness: Brightness.dark,
-);
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -57,7 +38,7 @@ class MyApp extends StatelessWidget {
     return Consumer<AppDataController>(
       builder: (context, model, child) {
         return MaterialApp(
-          theme: model.isDarkTheme ? myDarkTheme : myLightTheme,
+          theme: model.themeData,
           builder: EasyLoading.init(),
           initialRoute: LoginCheckPage.id,
           routes: {
