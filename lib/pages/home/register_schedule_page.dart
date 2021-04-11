@@ -55,19 +55,21 @@ class RegisterSchedulePage extends StatelessWidget {
                         const SizedBox(height: 32),
                         // 候補日一覧
                         // Expanded(child: model.candidateDatesForm),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 32),
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: ElevatedButton(
+                            onPressed: () =>
+                                registerScheduleAndPopNavigation(context),
+                            child: const Text(
+                              '予定を登録',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 48),
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: ElevatedButton(
-                    onPressed: () => registerScheduleAndPopNavigation(context),
-                    child: const Text(
-                      '予定を登録',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

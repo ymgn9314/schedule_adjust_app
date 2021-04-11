@@ -19,7 +19,7 @@ class CalendarForm extends StatelessWidget {
   final CalendarFormat _calendarFormat = CalendarFormat.month;
   final DateTime _firstDay = DateTime.now();
   final DateTime _lastDay = DateTime.now().add(const Duration(days: 30));
-  final DateTime _focusDay = DateTime.now();
+  DateTime _focusDay = DateTime.now();
 
   // 上部のスナックバー連打防止用
   bool isDisplayTopSnackbar = true;
@@ -45,6 +45,7 @@ class CalendarForm extends StatelessWidget {
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    _focusDay = focusedDay;
     if (_selectedDays.contains(selectedDay)) {
       _selectedDays.remove(selectedDay);
     } else {
@@ -112,6 +113,9 @@ class CalendarForm extends StatelessWidget {
                   context
                       .read<RegisterScheduleController>()
                       .callNotifyListeners();
+                },
+                onPageChanged: (focusedDay) {
+                  _focusDay = focusedDay;
                 },
                 // 選択できない日付を選択したらエラーを出す
                 onDisabledDayTapped: (selectedDay) async {
