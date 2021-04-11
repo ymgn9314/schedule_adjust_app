@@ -9,6 +9,10 @@ class FriendListPage extends StatelessWidget {
     print('FriendListPage#build()');
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

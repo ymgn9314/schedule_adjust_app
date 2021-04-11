@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/widgets/candidates_form.dart';
-import 'package:high_hat/widgets/deadline_form.dart';
 import 'package:high_hat/widgets/schedule_card.dart';
 import 'package:high_hat/widgets/title_form.dart';
 
@@ -11,7 +10,6 @@ class ScheduleDataController extends ChangeNotifier {
 
   void add({
     required TitleForm titleForm,
-    required DeadlineForm deadlineForm,
     required CandidateDatesForm candidateDatesForm,
   }) {
     print('AppDataController#add()');
@@ -19,7 +17,6 @@ class ScheduleDataController extends ChangeNotifier {
     scheduleList.add(
       ScheduleCard(
         titleForm: titleForm,
-        deadlineForm: deadlineForm,
         candidateDatesForm: candidateDatesForm,
         ownerUid: user!.uid,
         ownerPhotoUrl: user.photoURL!,

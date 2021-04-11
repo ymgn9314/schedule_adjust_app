@@ -69,7 +69,7 @@ class CandidateDateComponent extends StatelessWidget {
     return InputChip(
       backgroundColor: Theme.of(context).accentColor,
       label: Text(
-        DateFormat('yyyy/MM/dd HH:mm').format(_dateTime),
+        DateFormat.yMMMMEEEEd().add_jms().format(_dateTime),
         style: Theme.of(context).textTheme.bodyText1,
       ),
       deleteIcon: Icon(

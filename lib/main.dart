@@ -8,13 +8,17 @@ import 'package:high_hat/pages/Home/register_schedule_page.dart';
 import 'package:high_hat/pages/Login/login_page.dart';
 import 'package:high_hat/pages/Home/schedule_page.dart';
 import 'package:high_hat/controller/login_authentication_controller.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'pages/Login/login_check_page.dart';
+
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  Intl.defaultLocale = 'ja_JP'; // 'ja' でも良い
+  await initializeDateFormatting('ja_JP');
   runApp(
     MultiProvider(
       providers: [

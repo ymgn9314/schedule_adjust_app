@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/app_data_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,10 @@ class SchedulePage extends StatelessWidget {
     print('SchedulePage#build()');
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Selector<ScheduleDataController, int>(
         selector: (context, model) => model.scheduleList.length,
         builder: (context, length, child) {
