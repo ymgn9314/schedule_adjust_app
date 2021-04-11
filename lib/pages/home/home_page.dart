@@ -47,13 +47,19 @@ class _HomePage extends StatelessWidget {
       builder: (context, currentIndex, child) {
         return Scaffold(
           appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             title: Text(
               _appBarTitleList[
                   context.read<BottomNavigationController>().currentIndex],
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           body: _pageList[currentIndex],
           bottomNavigationBar: BottomNavigationBar(
+            // ボトムナビゲーションのラベル表示を消す
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
             currentIndex: currentIndex,
             onTap: (index) {
               context.read<BottomNavigationController>().currentIndex = index;
@@ -61,7 +67,7 @@ class _HomePage extends StatelessWidget {
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today),
-                label: '調整中の予定',
+                label: '予定',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.supervisor_account),

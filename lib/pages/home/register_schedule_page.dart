@@ -26,7 +26,16 @@ class RegisterSchedulePage extends StatelessWidget {
     return ChangeNotifierProvider<RegisterScheduleController>(
       create: (context) => RegisterScheduleController(),
       child: Scaffold(
-        appBar: AppBar(title: const Text('予定を追加')),
+        appBar: AppBar(
+          title: const Text(
+            '予定を追加',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
         body: Consumer<RegisterScheduleController>(
           builder: (context, model, child) {
             return Column(
