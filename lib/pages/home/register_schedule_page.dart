@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:high_hat/controller/app_data_controller.dart';
 import 'package:high_hat/controller/register_schedule_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:provider/provider.dart';
 
-class RegisterSchedulePage extends StatelessWidget {
+class RegisterSchedulePage extends StatefulWidget {
   static const id = 'register_schedule_page';
+
+  @override
+  _RegisterSchedulePageState createState() => _RegisterSchedulePageState();
+}
+
+class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
+  final _formKey = GlobalKey<FormState>();
 
   void registerScheduleAndPopNavigation(BuildContext context) {
     // 予定を登録する
@@ -23,6 +29,8 @@ class RegisterSchedulePage extends StatelessWidget {
   Widget build(BuildContext context) {
     print('_Home in RegisterSchedulePage#build()');
 
+    final bottomSpace = MediaQuery.of(context).viewInsets.bottom;
+
     return ChangeNotifierProvider<RegisterScheduleController>(
       create: (context) => RegisterScheduleController(),
       child: Scaffold(
@@ -36,44 +44,50 @@ class RegisterSchedulePage extends StatelessWidget {
             ),
           ),
         ),
+        resizeToAvoidBottomInset: false,
         body: Consumer<RegisterScheduleController>(
           builder: (context, model, child) {
-            return Column(
-              children: [
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // カレンダーフォーム
-                        model.calendarForm,
-                        // 題名
-                        model.titleForm,
-                        // 備考欄
-                        model.remarksForm,
-                        const SizedBox(height: 32),
-                        // 候補日一覧
-                        // Expanded(child: model.candidateDatesForm),
-                        Container(
-                          padding: const EdgeInsets.symmetric(vertical: 32),
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: ElevatedButton(
-                            onPressed: () =>
-                                registerScheduleAndPopNavigation(context),
-                            child: const Text(
-                              '予定を登録',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
+            return SingleChildScrollView(
+              reverse: true,
+              child: Form(
+                key: _formKey,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(8, 0, 8, bottomSpace),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // カレンダーフォーム
+                      model.calendarForm,
+                      // 題名
+                      model.titleForm,
+                      // 備考欄
+                      model.remarksForm,
+                      // 候補日一覧
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          child: model.candidateDatesForm),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // バリデーションが無効なら登録できない
+                            if (_formKey.currentState!.validate()) {
+                              registerScheduleAndPopNavigation(context);
+                            }
+                          },
+                          child: const Text(
+                            '予定を登録',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             );
           },
         ),
