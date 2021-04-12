@@ -1,5 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:high_hat/controller/login_authentication_controller.dart';
+import 'package:high_hat/controller/friend_data_controller.dart';
 import 'package:provider/provider.dart';
 
 class FriendListPage extends StatelessWidget {
@@ -13,20 +14,27 @@ class FriendListPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Consumer<LoginAuthenticationController>(
-                builder: (context, model, child) {
-              return const Text('In FriendListPage: ');
-            }),
-          ],
-        ),
+      body: Selector<FriendDataController, int>(
+        selector: (context, model) => model.friendList.length,
+        builder: (context, length, child) {
+          return ListView.builder(
+            itemCount: length,
+            itemBuilder: (context, index) {
+              return context.read<FriendDataController>().friendList[index];
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            null, //context.read<LoginAuthenticationController>().add(1),
+        onPressed: () {
+          // TODO(ymgn): 後でちゃんとする
+          final controller = context.read<FriendDataController>();
+          if (controller.friendList.length < 10) {
+            final user = FirebaseAuth.instance.currentUser;
+            controller.add(
+                displayName: user!.displayName!, photoUrl: user.photoURL!);
+          }
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,

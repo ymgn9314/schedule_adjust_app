@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/app_data_controller.dart';
+import 'package:high_hat/controller/friend_data_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,11 @@ class SchedulePage extends StatelessWidget {
                   ChangeNotifierProvider<ScheduleDataController>.value(
                 value:
                     Provider.of<ScheduleDataController>(context, listen: false),
-                child: RegisterSchedulePage(),
+                child: ChangeNotifierProvider<FriendDataController>.value(
+                  value:
+                      Provider.of<FriendDataController>(context, listen: false),
+                  child: RegisterSchedulePage(),
+                ),
               ),
             ),
           );

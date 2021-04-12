@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/friend_data_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/controller/bottom_navigation_controller.dart';
 import 'package:high_hat/pages/Home/account_page.dart';
@@ -18,6 +19,9 @@ class HomePage extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => ScheduleDataController(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FriendDataController(),
         ),
       ],
       child: _HomePage(),

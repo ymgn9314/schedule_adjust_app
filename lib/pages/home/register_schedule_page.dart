@@ -20,7 +20,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
         context.read<RegisterScheduleController>();
     scheduleDataController.add(
       titleForm: registerScheduleController.titleForm,
-      candidateDatesForm: registerScheduleController.candidateDatesForm,
+      calendarForm: registerScheduleController.calendarForm,
     );
     Navigator.of(context).pop();
   }
@@ -62,15 +62,23 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
                       model.titleForm,
                       // 備考欄
                       model.remarksForm,
-                      // 候補日一覧
+                      // 友達一覧
                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.2,
-                          child: model.candidateDatesForm),
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        child: model.friendForm,
+                      ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                         width: double.infinity,
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                          ),
                           onPressed: () {
+                            // キーボードが開かれていたら閉じる
+                            FocusScope.of(context).unfocus();
                             // バリデーションが無効なら登録できない
                             if (_formKey.currentState!.validate()) {
                               registerScheduleAndPopNavigation(context);

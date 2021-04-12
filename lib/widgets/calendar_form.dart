@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+@immutable
 class CalendarFormField extends FormField<LinkedHashSet<DateTime>> {
   CalendarFormField({
     required FormFieldValidator<LinkedHashSet<DateTime>> validator,
@@ -84,14 +85,14 @@ class CalendarFormField extends FormField<LinkedHashSet<DateTime>> {
           },
         );
 
-  CalendarFormat calendarFormat;
-  DateTime firstDay;
-  DateTime lastDay;
-  DateTime focusDay;
-  void Function(LinkedHashSet<DateTime>)? onUpdate;
-  void Function(DateTime)? onDisabledDayTapped;
-  void Function(DateTime)? onChangeFocusDay;
-  CalendarStyle calendarStyle;
+  final CalendarFormat calendarFormat;
+  final DateTime firstDay;
+  final DateTime lastDay;
+  final DateTime focusDay;
+  final void Function(LinkedHashSet<DateTime>)? onUpdate;
+  final void Function(DateTime)? onDisabledDayTapped;
+  final void Function(DateTime)? onChangeFocusDay;
+  final CalendarStyle calendarStyle;
 }
 
 class CalendarForm extends StatelessWidget {
@@ -162,6 +163,14 @@ class CalendarForm extends StatelessWidget {
                       isForceShow: true,
                     );
                     return '2日以上選択してください';
+                  } else if (value.length > 14) {
+                    // スナックバー表示
+                    TopSnackBar().show(
+                      context,
+                      '14日までしか選択できません',
+                      isForceShow: true,
+                    );
+                    return '14日までしか選択できません';
                   }
                   return null;
                 },

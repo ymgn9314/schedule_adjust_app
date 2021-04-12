@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:high_hat/widgets/calendar_form.dart';
 
 import 'candidates_form.dart';
 import 'title_form.dart';
@@ -6,7 +7,7 @@ import 'title_form.dart';
 class ScheduleCard extends StatelessWidget {
   ScheduleCard({
     required this.titleForm,
-    required this.candidateDatesForm,
+    required this.calendarForm,
     required this.ownerUid,
     required this.ownerPhotoUrl,
   });
@@ -17,7 +18,7 @@ class ScheduleCard extends StatelessWidget {
   // 友達一覧: List<uid>? => ここもう少し考える必要あり(予定作成者のphotoURLを表示させたい)
   // ユーザーのuid, photoURLはStringで別々に持っておく？(firestoreはUser型保存できない)
   TitleForm titleForm;
-  CandidateDatesForm candidateDatesForm;
+  CalendarForm calendarForm;
   String ownerUid;
   String ownerPhotoUrl;
 
