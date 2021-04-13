@@ -148,8 +148,8 @@ class AddFriendComponent extends StatelessWidget {
         // キーボードが開かれていたら閉じる
         FocusScope.of(context).unfocus();
         // TODO(ymgn): 後でちゃんと処理したほうがいい？
-        // 10msec待つ（キーボード閉じるまで待つ）
-        await Future<void>.delayed(const Duration(milliseconds: 10));
+        // 20msec待つ（キーボード閉じるまで待つ）
+        await Future<void>.delayed(const Duration(milliseconds: 20));
 
         final registerScheduleController =
             context.read<RegisterScheduleController>();
