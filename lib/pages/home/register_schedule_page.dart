@@ -80,7 +80,11 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
                             // キーボードが開かれていたら閉じる
                             FocusScope.of(context).unfocus();
                             // バリデーションが無効なら登録できない
-                            if (_formKey.currentState!.validate()) {
+                            final isValidate =
+                                _formKey.currentState!.validate();
+                            final isValidate2 =
+                                model.friendForm.validate(context) == null;
+                            if (isValidate && isValidate2) {
                               registerScheduleAndPopNavigation(context);
                             }
                           },

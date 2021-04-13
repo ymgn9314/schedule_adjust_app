@@ -8,20 +8,24 @@ import 'package:high_hat/util/friend_data.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 
-// class FriendFormField extends FormField<LinkedHashSet<FriendData>> {
-//   FriendFormField({
-//     required this.addFriendComponent,
-//   }) : super();
-// }
-
+@immutable
 class FriendForm extends StatelessWidget {
   // 友達一覧リスト(重複を避けるためにセットにする)
-  LinkedHashSet<FriendData> selectedFriendSet = LinkedHashSet<FriendData>(
+  final LinkedHashSet<FriendData> selectedFriendSet = LinkedHashSet<FriendData>(
     equals: (lhs, rhs) => lhs == rhs,
     hashCode: (data) => data.hashCode,
   );
   // 友達追加コンポーネント
   final AddFriendComponent _addFriendComponent = AddFriendComponent();
+
+  String? validate(BuildContext context) {
+    // 友達を１人も選択していなかったら
+    if (selectedFriendSet.isEmpty) {
+      TopSnackBar().show(context, '友達を一人以上選択してください', isForceShow: true);
+      return '友達を一人以上選択してください';
+    }
+    return null;
+  }
 
   // 削除
   void delete(BuildContext context, FriendData data) {
@@ -166,6 +170,14 @@ class AddFriendComponent extends StatelessWidget {
           context: context,
           builder: (ctx) {
             return MultiSelectBottomSheet(
+              confirmText: const Text(
+                '決定',
+                style: TextStyle(color: Colors.white),
+              ),
+              cancelText: const Text(
+                'キャンセル',
+                style: TextStyle(color: Colors.white),
+              ),
               itemsTextStyle: const TextStyle(color: Colors.white),
               selectedItemsTextStyle: const TextStyle(
                   color: Colors.white, fontWeight: FontWeight.bold),
