@@ -1,32 +1,50 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:collection';
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/app_data_controller.dart';
 import 'package:high_hat/controller/friend_data_controller.dart';
 import 'package:high_hat/controller/register_schedule_controller.dart';
 import 'package:high_hat/util/show_top_snackbar.dart';
+import 'package:high_hat/util/friend_data.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 
+// class FriendFormField extends FormField<LinkedHashSet<FriendData>> {
+//   FriendFormField({
+//     required this.addFriendComponent,
+//   }) : super();
+// }
+
 class FriendForm extends StatelessWidget {
-  // 友達一覧リスト
-  List<Widget> friendList = [AddFriendComponent()];
+  // 友達一覧リスト(重複を避けるためにセットにする)
+  LinkedHashSet<FriendData> selectedFriendSet = LinkedHashSet<FriendData>(
+    equals: (lhs, rhs) => lhs == rhs,
+    hashCode: (data) => data.hashCode,
+  );
+  // 友達追加コンポーネント
+  final AddFriendComponent _addFriendComponent = AddFriendComponent();
 
   // 削除
-  void delete(BuildContext context, FriendComponent component) {
-    friendList.remove(component);
+  void delete(BuildContext context, FriendData data) {
+    selectedFriendSet.remove(data);
     context.read<RegisterScheduleController>().callNotifyListeners();
   }
 
   // 追加
-  void add(BuildContext context, FriendComponent component) {
-    // (自分合わせて)10人以上は追加できないようにする
-    if (friendList.length > 9) {
-      TopSnackBar().show(context, '9人以上は追加できません');
-      return;
-    }
+  void add(BuildContext context, FriendData data) {
     // 既に追加されていなければ追加する
-    if (!friendList.contains(component)) {
-      friendList.insert(friendList.length - 1, component);
+    if (!selectedFriendSet.contains(data)) {
+      selectedFriendSet.add(data);
       context.read<RegisterScheduleController>().callNotifyListeners();
     }
+  }
+
+  // 一括変更
+  void applyChanges(BuildContext context, List<FriendData> list) {
+    selectedFriendSet.clear();
+    list.forEach((e) {
+      selectedFriendSet.add(e);
+    });
+    context.read<RegisterScheduleController>().callNotifyListeners();
   }
 
   @override
@@ -40,7 +58,8 @@ class FriendForm extends StatelessWidget {
         ),
         Expanded(
           child: Selector<RegisterScheduleController, int>(
-            selector: (context, model) => model.friendForm.friendList.length,
+            selector: (context, model) =>
+                model.friendForm.selectedFriendSet.length,
             builder: (context, length, child) {
               return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -49,9 +68,17 @@ class FriendForm extends StatelessWidget {
                 ),
                 scrollDirection: Axis.vertical,
                 primary: false,
-                itemCount: friendList.length,
+                itemCount: selectedFriendSet.length + 1,
                 itemBuilder: (context, index) {
-                  return friendList[index];
+                  return [
+                    // FriendDataをFriendComponentに変換する
+                    ...selectedFriendSet
+                        .map((e) => FriendComponent(data: e))
+                        .toList(),
+                    // 友達追加ボタン
+                    _addFriendComponent
+                  ][index];
+                  // return friendList[index];
                 },
               );
             },
@@ -65,20 +92,20 @@ class FriendForm extends StatelessWidget {
 // 友達単一コンポーネント
 class FriendComponent extends StatelessWidget {
   const FriendComponent({
-    required this.user,
+    required this.data,
   });
 
-  final User user;
+  final FriendData data;
 
   @override
   Widget build(BuildContext context) {
     return InputChip(
       avatar: CircleAvatar(
-        backgroundImage: NetworkImage(user.photoURL!),
+        backgroundImage: NetworkImage(data.photoUrl),
       ),
-      backgroundColor: Theme.of(context).accentColor,
+      backgroundColor: context.read<AppDataController>().color[500],
       label: Text(
-        user.displayName!,
+        data.displayName,
         style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
@@ -91,7 +118,7 @@ class FriendComponent extends StatelessWidget {
       onDeleted: () {
         // ×ボタンが押されたら候補日を削除する
         final controller = context.read<RegisterScheduleController>();
-        controller.friendForm.delete(context, this);
+        controller.friendForm.delete(context, data);
       },
     );
   }
@@ -101,49 +128,71 @@ class FriendComponent extends StatelessWidget {
 class AddFriendComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final friendDataController = context.read<FriendDataController>();
+
+    final _items = friendDataController.friendSet
+        .map<MultiSelectItem<FriendData>>((elm) => MultiSelectItem<FriendData>(
+              elm,
+              elm.displayName,
+            ))
+        .toList();
+
     return IconButton(
-      icon:
-          Icon(Icons.add_circle_outline, color: Theme.of(context).accentColor),
+      icon: Icon(Icons.add_circle_outline,
+          color: context.read<AppDataController>().color[500]),
       onPressed: () async {
-        // TODO(ymgn): 後でちゃんとする
-        final user = FirebaseAuth.instance.currentUser;
+        // キーボードが開かれていたら閉じる
+        FocusScope.of(context).unfocus();
+        // TODO(ymgn): 後でちゃんと処理したほうがいい？
+        // 10msec待つ（キーボード閉じるまで待つ）
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+
         final registerScheduleController =
             context.read<RegisterScheduleController>();
 
-        final friendDataController = context.read<FriendDataController>();
-        final result = await showDialog<List<User?>>(
+        // (自分合わせて)10人以上は追加できないようにする
+        if (registerScheduleController.friendForm.selectedFriendSet.length >=
+            9) {
+          TopSnackBar().show(context, '9人までしか追加できません');
+          return;
+        }
+        // ボトムシートを表示する
+        await showModalBottomSheet<dynamic>(
+          backgroundColor: context.read<AppDataController>().color[400],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          isScrollControlled: true, // required for min/max child size
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              actions: [
-                SimpleDialogOption(
-                  onPressed: () {
-                    Navigator.of(context).pop<List<User?>>([]);
-                  },
-                  child: const Text('キャンセル'),
+          builder: (ctx) {
+            return MultiSelectBottomSheet(
+              itemsTextStyle: const TextStyle(color: Colors.white),
+              selectedItemsTextStyle: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+              unselectedColor: Colors.white,
+              selectedColor: Colors.white,
+              checkColor: context.read<AppDataController>().color,
+              title: const Text(
+                '友達を選択',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-                SimpleDialogOption(
-                  onPressed: () {
-                    final user = FirebaseAuth.instance.currentUser;
-                    Navigator.of(context).pop<List<User?>>([user]);
-                  },
-                  child: const Text('決定'),
-                ),
-              ],
-              title: const Text('友達を選択'),
-              content: Container(
-                width: double.maxFinite,
-                child: ListView(children: friendDataController.friendList),
               ),
+              items: _items,
+              initialValue: registerScheduleController
+                  .friendForm.selectedFriendSet
+                  .toList(),
+              onConfirm: (values) {
+                final list = values as List<FriendData>;
+                // 変更を一括で反映する
+                registerScheduleController.friendForm
+                    .applyChanges(context, list);
+              },
+              maxChildSize: 0.5,
             );
           },
         );
-        if (result != null) {
-          result.forEach((element) {
-            registerScheduleController.friendForm
-                .add(context, FriendComponent(user: element!));
-          });
-        }
       },
     );
   }

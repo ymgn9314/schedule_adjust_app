@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:high_hat/widgets/calendar_form.dart';
-import 'package:high_hat/widgets/candidates_form.dart';
 import 'package:high_hat/widgets/friend_form.dart';
 import 'package:high_hat/widgets/remarks_form.dart';
 import 'package:high_hat/widgets/title_form.dart';

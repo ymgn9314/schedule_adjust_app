@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/widgets/calendar_form.dart';
-import 'package:high_hat/widgets/candidates_form.dart';
 import 'package:high_hat/widgets/schedule_card.dart';
 import 'package:high_hat/widgets/title_form.dart';
 

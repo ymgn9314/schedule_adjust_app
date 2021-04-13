@@ -15,12 +15,20 @@ class FriendListPage extends StatelessWidget {
         elevation: 0,
       ),
       body: Selector<FriendDataController, int>(
-        selector: (context, model) => model.friendList.length,
+        selector: (context, model) => model.friendSet.length,
         builder: (context, length, child) {
           return ListView.builder(
             itemCount: length,
             itemBuilder: (context, index) {
-              return context.read<FriendDataController>().friendList[index];
+              final controller = context.read<FriendDataController>();
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      controller.friendSet.elementAt(index).photoUrl),
+                ),
+                title: Text(controller.friendSet.elementAt(index).displayName),
+                subtitle: Text(controller.friendSet.elementAt(index).uid),
+              );
             },
           );
         },
@@ -29,10 +37,13 @@ class FriendListPage extends StatelessWidget {
         onPressed: () {
           // TODO(ymgn): 後でちゃんとする
           final controller = context.read<FriendDataController>();
-          if (controller.friendList.length < 10) {
+          if (controller.friendSet.length < 10) {
             final user = FirebaseAuth.instance.currentUser;
             controller.add(
-                displayName: user!.displayName!, photoUrl: user.photoURL!);
+              uid: user!.uid,
+              displayName: user.displayName!,
+              photoUrl: user.photoURL!,
+            );
           }
         },
         child: Row(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:high_hat/widgets/calendar_form.dart';
 
-import 'candidates_form.dart';
 import 'title_form.dart';
 
 class ScheduleCard extends StatelessWidget {
