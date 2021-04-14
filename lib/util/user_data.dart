@@ -1,5 +1,5 @@
-class FriendData {
-  FriendData({
+class UserData {
+  UserData({
     required this.uid,
     required this.displayName,
     required this.photoUrl,
@@ -10,7 +10,7 @@ class FriendData {
     if (identical(this, other)) {
       return true;
     }
-    if (other is FriendData) {
+    if (other is UserData) {
       return runtimeType == other.runtimeType && uid == other.uid;
     }
     return false;

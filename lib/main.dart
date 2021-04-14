@@ -2,17 +2,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:high_hat/controller/app_data_controller.dart';
-import 'package:high_hat/pages/Home/account_page.dart';
-import 'package:high_hat/pages/Home/friend_list_page.dart';
-import 'package:high_hat/pages/Home/register_schedule_page.dart';
-import 'package:high_hat/pages/Login/login_page.dart';
-import 'package:high_hat/pages/Home/schedule_page.dart';
+import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/controller/login_authentication_controller.dart';
+import 'package:high_hat/controller/schedule_data_controller.dart';
+import 'package:high_hat/pages/Home/account_page.dart';
+import 'package:high_hat/pages/Home/register_schedule_page.dart';
+import 'package:high_hat/pages/Home/schedule_page.dart';
+import 'package:high_hat/pages/Login/login_page.dart';
+import 'package:high_hat/pages/home/friend_page.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'pages/Login/login_check_page.dart';
 
-import 'package:intl/date_symbol_data_local.dart';
+import 'pages/Login/login_check_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,12 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<AppDataController>(
           create: (context) => AppDataController(),
+        ),
+        ChangeNotifierProvider<ScheduleDataController>(
+          create: (context) => ScheduleDataController(),
+        ),
+        ChangeNotifierProvider<UserDataController>(
+          create: (context) => UserDataController(),
         ),
       ],
       child: MyApp(),
@@ -50,7 +58,7 @@ class MyApp extends StatelessWidget {
             LoginPage.id: (context) => LoginPage(),
             SchedulePage.id: (context) => SchedulePage(),
             RegisterSchedulePage.id: (context) => RegisterSchedulePage(),
-            FriendListPage.id: (context) => FriendListPage(),
+            FriendPage.id: (context) => FriendPage(),
             AccountPage.id: (context) => AccountPage(),
           },
         );

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:high_hat/controller/friend_data_controller.dart';
-import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/controller/bottom_navigation_controller.dart';
 import 'package:high_hat/pages/Home/account_page.dart';
-import 'package:high_hat/pages/Home/friend_list_page.dart';
 import 'package:high_hat/pages/Home/schedule_page.dart';
+import 'package:high_hat/pages/home/friend_page.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -17,12 +15,6 @@ class HomePage extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => BottomNavigationController(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => ScheduleDataController(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => FriendDataController(),
-        ),
       ],
       child: _HomePage(),
     );
@@ -32,7 +24,7 @@ class HomePage extends StatelessWidget {
 class _HomePage extends StatelessWidget {
   final List<Widget> _pageList = <Widget>[
     SchedulePage(),
-    FriendListPage(),
+    FriendPage(),
     AccountPage(),
   ];
 

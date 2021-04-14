@@ -1,11 +1,10 @@
 import 'dart:collection';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/register_schedule_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
-import 'package:high_hat/util/friend_data.dart';
 import 'package:high_hat/util/schedule_data.dart';
+import 'package:high_hat/util/user_data.dart';
 import 'package:provider/provider.dart';
 
 class RegisterSchedulePage extends StatefulWidget {
@@ -25,7 +24,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
     final rController = context.read<RegisterScheduleController>();
 
     // 予定作成者(オーナー)のFriendData
-    final owner = FriendData(
+    final owner = UserData(
         uid: user!.uid,
         displayName: user.displayName!,
         photoUrl: user.photoURL!);

@@ -1,17 +1,17 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/app_data_controller.dart';
-import 'package:high_hat/controller/friend_data_controller.dart';
 import 'package:high_hat/controller/register_schedule_controller.dart';
+import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/util/show_top_snackbar.dart';
-import 'package:high_hat/util/friend_data.dart';
+import 'package:high_hat/util/user_data.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 
 @immutable
 class FriendForm extends StatelessWidget {
   // 友達一覧リスト(重複を避けるためにセットにする)
-  final LinkedHashSet<FriendData> selectedFriendSet = LinkedHashSet<FriendData>(
+  final LinkedHashSet<UserData> selectedFriendSet = LinkedHashSet<UserData>(
     equals: (lhs, rhs) => lhs == rhs,
     hashCode: (data) => data.hashCode,
   );
@@ -23,18 +23,21 @@ class FriendForm extends StatelessWidget {
     if (selectedFriendSet.isEmpty) {
       TopSnackBar().show(context, '友達を一人以上選択してください', isForceShow: true);
       return '友達を一人以上選択してください';
+    } else if (selectedFriendSet.length > 9) {
+      TopSnackBar().show(context, '友達は9人までしか選択できません', isForceShow: true);
+      return '友達は9人までしか選択できません';
     }
     return null;
   }
 
   // 削除
-  void delete(BuildContext context, FriendData data) {
+  void delete(BuildContext context, UserData data) {
     selectedFriendSet.remove(data);
     context.read<RegisterScheduleController>().callNotifyListeners();
   }
 
   // 追加
-  void add(BuildContext context, FriendData data) {
+  void add(BuildContext context, UserData data) {
     // 既に追加されていなければ追加する
     if (!selectedFriendSet.contains(data)) {
       selectedFriendSet.add(data);
@@ -43,7 +46,7 @@ class FriendForm extends StatelessWidget {
   }
 
   // 一括変更
-  void applyChanges(BuildContext context, List<FriendData> list) {
+  void applyChanges(BuildContext context, List<UserData> list) {
     selectedFriendSet.clear();
     list.forEach((e) {
       selectedFriendSet.add(e);
@@ -99,7 +102,7 @@ class FriendComponent extends StatelessWidget {
     required this.data,
   });
 
-  final FriendData data;
+  final UserData data;
 
   @override
   Widget build(BuildContext context) {
@@ -132,10 +135,10 @@ class FriendComponent extends StatelessWidget {
 class AddFriendComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final friendDataController = context.read<FriendDataController>();
+    final userDataController = context.read<UserDataController>();
 
-    final _items = friendDataController.friendSet
-        .map<MultiSelectItem<FriendData>>((elm) => MultiSelectItem<FriendData>(
+    final _items = userDataController.userSet
+        .map<MultiSelectItem<UserData>>((elm) => MultiSelectItem<UserData>(
               elm,
               elm.displayName,
             ))
@@ -148,18 +151,12 @@ class AddFriendComponent extends StatelessWidget {
         // キーボードが開かれていたら閉じる
         FocusScope.of(context).unfocus();
         // TODO(ymgn): 後でちゃんと処理したほうがいい？
-        // 20msec待つ（キーボード閉じるまで待つ）
-        await Future<void>.delayed(const Duration(milliseconds: 20));
+        // 50msec待つ（キーボード閉じるまで待つ）
+        await Future<void>.delayed(const Duration(milliseconds: 50));
 
         final registerScheduleController =
             context.read<RegisterScheduleController>();
 
-        // (自分合わせて)10人以上は追加できないようにする
-        if (registerScheduleController.friendForm.selectedFriendSet.length >=
-            9) {
-          TopSnackBar().show(context, '9人までしか追加できません');
-          return;
-        }
         // ボトムシートを表示する
         await showModalBottomSheet<dynamic>(
           backgroundColor: context.read<AppDataController>().color[400],
@@ -178,6 +175,10 @@ class AddFriendComponent extends StatelessWidget {
                 'キャンセル',
                 style: TextStyle(color: Colors.white),
               ),
+              // 検索できるようにする
+              //searchable: true,
+              //searchHintStyle: const TextStyle(color: Colors.white),
+              //searchTextStyle: const TextStyle(color: Colors.white),
               itemsTextStyle: const TextStyle(color: Colors.white),
               selectedItemsTextStyle: const TextStyle(
                   color: Colors.white, fontWeight: FontWeight.bold),
@@ -196,7 +197,7 @@ class AddFriendComponent extends StatelessWidget {
                   .friendForm.selectedFriendSet
                   .toList(),
               onConfirm: (values) {
-                final list = values as List<FriendData>;
+                final list = values as List<UserData>;
                 // 変更を一括で反映する
                 registerScheduleController.friendForm
                     .applyChanges(context, list);

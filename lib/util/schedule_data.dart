@@ -1,11 +1,14 @@
 import 'dart:collection';
-import 'package:high_hat/util/friend_data.dart';
+import 'package:high_hat/util/user_data.dart';
 
 // 予定に対する回答
 enum Answer {
-  ok, // ◯
-  either, // △
-  ng, // ×
+  // ◯
+  ok,
+  // △
+  either,
+  // ×
+  ng,
 }
 
 class FriendAnswerData {
@@ -16,7 +19,7 @@ class FriendAnswerData {
   });
 
   // 参加者
-  FriendData person;
+  UserData person;
   // 回答したか
   bool isAnswer;
   // 日付ごとの回答
@@ -36,7 +39,7 @@ class ScheduleData {
   // 備考欄
   String remarks;
   // 予定作成者(オーナー)の情報
-  FriendData owner;
+  UserData owner;
   // 参加者(オーナーも含む)
   LinkedHashSet<FriendAnswerData> participants;
 }
