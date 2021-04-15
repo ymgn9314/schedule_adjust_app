@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/app_data_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
+import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
 import 'package:high_hat/util/schedule_data.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +54,12 @@ class SchedulePage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
+          // firestoreから予定追加画面に表示する友達一覧をキャッシュする
+          await context
+              .read<UserDataController>()
+              .fetchRegisterPageAddFriendItems();
+
           // 予定登録ページへ遷移
           Navigator.of(context).push<void>(
             MaterialPageRoute(

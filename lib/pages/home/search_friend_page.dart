@@ -1,29 +1,19 @@
-import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
-import 'package:high_hat/util/user_data.dart';
 import 'package:outline_search_bar/outline_search_bar.dart';
 import 'package:provider/provider.dart';
 
 // 友達検索ページ
 class SearchFriendPage extends StatelessWidget {
-  Future<QuerySnapshot> _fetchFirestoreUser(BuildContext context) async {
+  Future<bool> _fetchFirestoreUser(BuildContext context) async {
     final controller = context.read<UserDataController>();
     // Firestore上の全ユーザーを取得する(アプリ起動後初回のみ)
     if (controller.userSet.isEmpty) {
       await controller.fetchFirestoreUser();
     }
-    // usersコレクション/uidドキュメント/friendsコレクションのドキュメント一覧
-    final friendDocs = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('friends')
-        .get();
-
-    return friendDocs;
+    return true;
   }
 
   Widget searchBody(BuildContext context, QuerySnapshot snapshot) {
@@ -66,17 +56,7 @@ class SearchFriendPage extends StatelessWidget {
                             ? null
                             : () {
                                 // 友達をfirestoreに追加
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .collection('friends')
-                                    .doc(user.uid)
-                                    .set(
-                                  <String, dynamic>{
-                                    'displayName': user.displayName,
-                                    'photoUrl': user.photoUrl,
-                                  },
-                                );
+                                controller.addFriendToFirestore(user);
                               },
                         child: isAlreadyFriend
                             ? const Text('追加済み')
@@ -96,6 +76,7 @@ class SearchFriendPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('SearchFriendPage#build()');
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -110,14 +91,31 @@ class SearchFriendPage extends StatelessWidget {
       body: FutureBuilder(
         // firestoreからユーザー情報を取得
         future: _fetchFirestoreUser(context),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           // firestoreからのデータ取得が完了していない
-          if (snapshot.connectionState != ConnectionState.done) {
+          if (!snapshot.hasData) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-          return searchBody(context, snapshot.data!);
+          return StreamBuilder<QuerySnapshot>(
+            // users/uid/friendsコレクション内のドキュメント一覧をstreamで取得
+            stream: FirebaseFirestore.instance
+                .collection('users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .collection('friends')
+                .snapshots(),
+            builder: (context, snapshot) {
+              // firestoreからのデータ取得が完了していない
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return searchBody(context, snapshot.data!);
+            },
+          );
+          // return searchBody(context, snapshot.data!);
         },
       ),
     );

@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 @immutable
 class FriendForm extends StatelessWidget {
-  // 友達一覧リスト(重複を避けるためにセットにする)
+  // 友達一覧リスト
   final LinkedHashSet<UserData> selectedFriendSet = LinkedHashSet<UserData>(
     equals: (lhs, rhs) => lhs == rhs,
     hashCode: (data) => data.hashCode,
@@ -38,6 +38,7 @@ class FriendForm extends StatelessWidget {
 
   // 追加
   void add(BuildContext context, UserData data) {
+    print('friend add');
     // 既に追加されていなければ追加する
     if (!selectedFriendSet.contains(data)) {
       selectedFriendSet.add(data);
@@ -123,7 +124,7 @@ class FriendComponent extends StatelessWidget {
         color: Theme.of(context).buttonColor,
       ),
       onDeleted: () {
-        // ×ボタンが押されたら候補日を削除する
+        // ×ボタンが押されたら友達を削除する
         final controller = context.read<RegisterScheduleController>();
         controller.friendForm.delete(context, data);
       },
@@ -135,15 +136,6 @@ class FriendComponent extends StatelessWidget {
 class AddFriendComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final userDataController = context.read<UserDataController>();
-
-    final _items = userDataController.userSet
-        .map<MultiSelectItem<UserData>>((elm) => MultiSelectItem<UserData>(
-              elm,
-              elm.displayName,
-            ))
-        .toList();
-
     return IconButton(
       icon: Icon(Icons.add_circle_outline,
           color: context.read<AppDataController>().color[500]),
@@ -154,8 +146,12 @@ class AddFriendComponent extends StatelessWidget {
         // 50msec待つ（キーボード閉じるまで待つ）
         await Future<void>.delayed(const Duration(milliseconds: 50));
 
+        // firestoreから友達情報をキャッシュする
+        //await _fetchFriend(context);
+
         final registerScheduleController =
             context.read<RegisterScheduleController>();
+        final userDataController = context.read<UserDataController>();
 
         // ボトムシートを表示する
         await showModalBottomSheet<dynamic>(
@@ -192,7 +188,7 @@ class AddFriendComponent extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              items: _items,
+              items: userDataController.registerPageAddFriendItems,
               initialValue: registerScheduleController
                   .friendForm.selectedFriendSet
                   .toList(),

@@ -1,10 +1,9 @@
-import 'dart:collection';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/register_schedule_controller.dart';
-import 'package:high_hat/controller/schedule_data_controller.dart';
-import 'package:high_hat/util/schedule_data.dart';
 import 'package:high_hat/util/user_data.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class RegisterSchedulePage extends StatefulWidget {
@@ -17,47 +16,102 @@ class RegisterSchedulePage extends StatefulWidget {
 class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
   final _formKey = GlobalKey<FormState>();
 
-  void registerScheduleAndPopNavigation(BuildContext context) {
+  Future<void> registerScheduleAndPopNavigation(BuildContext context) async {
     // 予定を登録する
     final user = FirebaseAuth.instance.currentUser;
-    final sController = context.read<ScheduleDataController>();
+    // final sController = context.read<ScheduleDataController>();
     final rController = context.read<RegisterScheduleController>();
 
-    // 予定作成者(オーナー)のFriendData
+    // 予定作成者(オーナー)のUserData
     final owner = UserData(
         uid: user!.uid,
         displayName: user.displayName!,
         photoUrl: user.photoURL!);
 
-    // 参加者(オーナー含む)のFriendData
-    final participantsSet = rController.friendForm.selectedFriendSet
+    // 参加者(オーナー含む)のUserData
+    final participantUsers = rController.friendForm.selectedFriendSet
       ..add(owner);
 
-    // 日付ごとの回答
-    final answerMap = LinkedHashMap<DateTime, Answer>();
-    rController.calendarForm.selectedDays.forEach((e) {
-      answerMap[e] = Answer.either;
+    // // 日付ごとの回答
+    // final answerMap = LinkedHashMap<DateTime, Answer>();
+    // rController.calendarForm.selectedDays.forEach((e) {
+    //   answerMap[e] = Answer.either;
+    // });
+
+    // // 参加者(オーナー含む)のFriendAnswerData
+    // final participants = LinkedHashSet<FriendAnswerData>();
+    // participantUsers.forEach(
+    //   (e) {
+    //     participants.add(
+    //       FriendAnswerData(
+    //         person: e,
+    //         isAnswer: false,
+    //         answerMap: answerMap,
+    //       ),
+    //     );
+    //   },
+    // );
+
+    // sController.add(
+    //     title: rController.titleForm.content,
+    //     remarks: rController.remarksForm.content,
+    //     owner: owner,
+    //     participants: participants);
+
+    // firestoreに予定を追加する
+    // 予定にはscheduleId(予定作成者のuid + 今の日時String型)を付与する
+    // 今の日時
+    final dateNow = DateFormat('yyyyMMddHHmms').format(DateTime.now())
+      ..replaceAll(RegExp(r'\s'), '');
+
+    final scheduleId = owner.uid + dateNow;
+
+    // 予定のタイトル
+    final title = rController.titleForm.content;
+    // 予定の備考欄
+    final remarks = rController.remarksForm.content;
+
+    // バッチ書き込みする
+    final batch = FirebaseFirestore.instance.batch();
+
+    // 参加者全員(オーナー含む)のscheduleサブコレクションにscheduleIdを追加
+    final usersCollection = FirebaseFirestore.instance.collection('users');
+    final emptyData = <String, dynamic>{};
+
+    for (final user in participantUsers) {
+      // users/uid/schedules/scheduleIdドキュメントを作成
+      // scheduleIdで/schedulesコレクション上のスケジュールを参照できる
+      final userDocReference =
+          usersCollection.doc(user.uid).collection('schedules').doc(scheduleId);
+      batch.set(userDocReference, emptyData);
+    }
+
+    // schedules/scheduleIdに予定のタイトル, 備考欄, 作成日時を追加する
+    final schedulesDocReference =
+        FirebaseFirestore.instance.collection('schedules').doc(scheduleId);
+    batch.set(schedulesDocReference, <String, dynamic>{
+      'title': title,
+      'remarks': remarks,
+      'createdAt': DateFormat('yyyy/MM/dd/HHmms').format(DateTime.now()),
     });
 
-    // 参加者(オーナー含む)のFriendAnswerData
-    var participants = LinkedHashSet<FriendAnswerData>();
-    participantsSet.forEach(
-      (e) {
-        participants.add(
-          FriendAnswerData(
-            person: e,
-            isAnswer: false,
-            answerMap: answerMap,
-          ),
-        );
-      },
-    );
+    for (final user in participantUsers) {
+      final doc = schedulesDocReference.collection('users').doc(user.uid);
+      // 予定に回答したか
+      batch.set(doc, <String, dynamic>{'isAnswer': false});
+      // 回答コレクション
+      final answerCollection = doc.collection('answers');
+      for (final day in rController.calendarForm.selectedDays) {
+        batch.set(answerCollection.doc(DateFormat('yyyyMMdd').format(day)),
+            <String, dynamic>{'answer': 1});
+      }
+    }
 
-    sController.add(
-        title: rController.titleForm.content,
-        remarks: rController.remarksForm.content,
-        owner: owner,
-        participants: participants);
+    // firestoreにコミット
+    await batch.commit().then((value) {
+      // コミットに成功した時の処理
+    });
+
     Navigator.of(context).pop();
   }
 
@@ -112,7 +166,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
                             // キーボードが開かれていたら閉じる
                             FocusScope.of(context).unfocus();
                             // バリデーションが無効なら登録できない
@@ -120,8 +174,9 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
                                 _formKey.currentState!.validate();
                             final isValidate2 =
                                 model.friendForm.validate(context) == null;
+                            // 予定をfirestoreに追加
                             if (isValidate && isValidate2) {
-                              registerScheduleAndPopNavigation(context);
+                              await registerScheduleAndPopNavigation(context);
                             }
                           },
                           child: const Text(
