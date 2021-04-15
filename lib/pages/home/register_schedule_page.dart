@@ -19,7 +19,6 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
   Future<void> registerScheduleAndPopNavigation(BuildContext context) async {
     // 予定を登録する
     final user = FirebaseAuth.instance.currentUser;
-    // final sController = context.read<ScheduleDataController>();
     final rController = context.read<RegisterScheduleController>();
 
     // 予定作成者(オーナー)のUserData
@@ -31,32 +30,6 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
     // 参加者(オーナー含む)のUserData
     final participantUsers = rController.friendForm.selectedFriendSet
       ..add(owner);
-
-    // // 日付ごとの回答
-    // final answerMap = LinkedHashMap<DateTime, Answer>();
-    // rController.calendarForm.selectedDays.forEach((e) {
-    //   answerMap[e] = Answer.either;
-    // });
-
-    // // 参加者(オーナー含む)のFriendAnswerData
-    // final participants = LinkedHashSet<FriendAnswerData>();
-    // participantUsers.forEach(
-    //   (e) {
-    //     participants.add(
-    //       FriendAnswerData(
-    //         person: e,
-    //         isAnswer: false,
-    //         answerMap: answerMap,
-    //       ),
-    //     );
-    //   },
-    // );
-
-    // sController.add(
-    //     title: rController.titleForm.content,
-    //     remarks: rController.remarksForm.content,
-    //     owner: owner,
-    //     participants: participants);
 
     // firestoreに予定を追加する
     // 予定にはscheduleId(予定作成者のuid + 今の日時String型)を付与する
@@ -93,6 +66,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
       'title': title,
       'remarks': remarks,
       'createdAt': DateFormat('yyyy/MM/dd/HHmms').format(DateTime.now()),
+      'ownerId': owner.uid,
     });
 
     for (final user in participantUsers) {
@@ -112,6 +86,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
       // コミットに成功した時の処理
     });
 
+    // 画面を抜ける
     Navigator.of(context).pop();
   }
 

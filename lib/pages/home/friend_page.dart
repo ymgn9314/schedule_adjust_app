@@ -59,9 +59,11 @@ class FriendPage extends StatelessWidget {
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  // データが取得できていなければSizedBoxを返す
+                  // データが取得できていなければ
                   if (!snapshot.hasData) {
-                    return const SizedBox();
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
                   }
                   // データが取得できた
                   return friendCard(

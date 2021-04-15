@@ -13,6 +13,17 @@ class UserDataController extends ChangeNotifier {
     hashCode: (data) => data.hashCode,
   );
 
+  // firestoreから取得したユーザー情報を(UserData)返す
+  Future<UserData> getUserDataFromFirestore(String uid) async {
+    final user =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    return UserData(
+      uid: uid,
+      displayName: user.get('displayName') as String,
+      photoUrl: user.get('photoUrl') as String,
+    );
+  }
+
   // 検索にヒットしたユーザー
   final hitUsers = LinkedHashSet<UserData>(
     equals: (lhs, rhs) => lhs == rhs,

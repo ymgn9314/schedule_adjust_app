@@ -1,31 +1,44 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:high_hat/controller/app_data_controller.dart';
-import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
-import 'package:high_hat/util/schedule_data.dart';
+import 'package:high_hat/util/user_data.dart';
 import 'package:provider/provider.dart';
 
 class SchedulePage extends StatelessWidget {
   static const id = 'schedule_page';
 
-  Widget ScheduleCard(ScheduleData data, MaterialColor cardMaterialColor) {
-    final friendNumber = data.participants.length;
-    int answerNumber = 0;
-    data.participants.forEach((e) {
-      if (e.isAnswer) answerNumber++;
-    });
-    // TODO(ymgn): 引数のcardMaterialColor使う?
-    return Card(
-      elevation: 4,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(data.owner.photoUrl),
-        ),
-        title: Text(data.title),
-        subtitle: Text(data.remarks),
-        trailing: Text('参加者${friendNumber}人(回答済み${answerNumber}人)'),
-      ),
+  Widget scheduleCard(
+      BuildContext context, DocumentSnapshot schedule, QuerySnapshot users) {
+    final friendNumber = users.docs.length;
+    final answerNumber =
+        users.docs.where((user) => user.get('isAnswer') as bool).length;
+
+    return FutureBuilder<UserData>(
+      // オーナーの情報を取得
+      future: context
+          .read<UserDataController>()
+          .getUserDataFromFirestore(schedule.get('ownerId') as String),
+      builder: (context, userData) {
+        // 取得できてなければ
+        if (!userData.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return Card(
+          elevation: 4,
+          child: ListTile(
+            leading: CircleAvatar(
+                backgroundImage: NetworkImage(userData.data!.photoUrl)),
+            title: Text(schedule.get('title') as String),
+            subtitle: Text(schedule.get('remarks') as String),
+            trailing: Text('参加者$friendNumber人(回答済み$answerNumber人)'),
+            onTap: () {
+              // TODO(ymgn): タップされた時の処理
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -38,17 +51,55 @@ class SchedulePage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Selector<ScheduleDataController, int>(
-        selector: (context, model) => model.scheduleList.length,
-        builder: (context, length, child) {
+      body: StreamBuilder<QuerySnapshot>(
+        // 自分のスケジュール一覧を取得する
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .collection('schedules')
+            .snapshots(),
+        builder:
+            (BuildContext context, AsyncSnapshot<QuerySnapshot> schedules) {
+          // firestoreから取得できてなければ
+          if (!schedules.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          // スケジュールごとにリストを作成する
           return ListView.builder(
-            itemCount: length,
+            itemCount: schedules.data!.docs.length,
             itemBuilder: (context, index) {
-              // スケジュールカードを作成して返す
-              final data =
-                  context.read<ScheduleDataController>().scheduleList[index];
-              final color = context.read<AppDataController>().color;
-              return ScheduleCard(data, color);
+              return FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection('schedules')
+                    .doc(schedules.data!.docs[index].id)
+                    .get(),
+                builder: (context, schedule) {
+                  // firestoreからデータ取得が完了していない
+                  if (!schedule.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('schedules')
+                        .doc(schedules.data!.docs[index].id)
+                        .collection('users')
+                        .snapshots(),
+                    builder: (context, users) {
+                      // firestoreからデータ取得が完了していない
+                      if (!users.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      return scheduleCard(context, schedule.data!, users.data!);
+                    },
+                  );
+                },
+              );
             },
           );
         },
@@ -61,7 +112,7 @@ class SchedulePage extends StatelessWidget {
               .fetchRegisterPageAddFriendItems();
 
           // 予定登録ページへ遷移
-          Navigator.of(context).push<void>(
+          await Navigator.of(context).push<void>(
             MaterialPageRoute(
               builder: (context) {
                 return RegisterSchedulePage();
