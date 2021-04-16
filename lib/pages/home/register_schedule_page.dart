@@ -76,7 +76,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
       // 回答コレクション
       final answerCollection = doc.collection('answers');
       for (final day in rController.calendarForm.selectedDays) {
-        batch.set(answerCollection.doc(DateFormat('yyyyMMdd').format(day)),
+        batch.set(answerCollection.doc(DateFormat('yyyy-MM-dd').format(day)),
             <String, dynamic>{'answer': 1});
       }
     }

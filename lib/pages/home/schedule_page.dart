@@ -3,8 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
+import 'package:high_hat/pages/home/account_page.dart';
 import 'package:high_hat/util/user_data.dart';
 import 'package:provider/provider.dart';
+
+import 'answer_schedule_page.dart';
 
 class SchedulePage extends StatelessWidget {
   static const id = 'schedule_page';
@@ -35,6 +38,11 @@ class SchedulePage extends StatelessWidget {
             trailing: Text('参加者$friendNumber人(回答済み$answerNumber人)'),
             onTap: () {
               // TODO(ymgn): タップされた時の処理
+              Navigator.of(context).push<void>(
+                MaterialPageRoute(builder: (context) {
+                  return AnswerSchedulePage(schedule.id);
+                }),
+              );
             },
           ),
         );
