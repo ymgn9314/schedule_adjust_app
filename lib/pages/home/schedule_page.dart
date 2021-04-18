@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
 import 'package:high_hat/pages/home/account_page.dart';
@@ -40,8 +41,39 @@ class SchedulePage extends StatelessWidget {
               // TODO(ymgn): タップされた時の処理
               Navigator.of(context).push<void>(
                 MaterialPageRoute(builder: (context) {
-                  return AnswerSchedulePage(schedule.id);
+                  return AnswerSchedulePage(schedule.id, answerNumber);
                 }),
+              );
+            },
+            onLongPress: () {
+              // 削除しますか？
+              showDialog<void>(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    title: const Text('削除しますか?'),
+                    content: const Text('削除した予定は閲覧することができなくなります'),
+                    actions: <Widget>[
+                      // ボタン領域
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('いいえ'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context
+                              .read<ScheduleDataController>()
+                              .deleteScheduleFromFirestore(schedule.id);
+                          Navigator.pop(context);
+                        },
+                        child: const Text('はい'),
+                      ),
+                    ],
+                  );
+                },
               );
             },
           ),
@@ -128,17 +160,25 @@ class SchedulePage extends StatelessWidget {
             ),
           );
         },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: const [
-            Icon(
-              Icons.add,
-              size: 16,
+        child: Stack(
+          children: [
+            const Positioned(
+              top: 18,
+              left: 7,
+              child: Icon(
+                Icons.add,
+                size: 16,
+                color: Colors.white70,
+              ),
             ),
-            Icon(
-              Icons.calendar_today,
-              size: 20,
+            const Positioned(
+              top: 18,
+              left: 20,
+              child: Icon(
+                Icons.calendar_today,
+                size: 20,
+                color: Colors.white70,
+              ),
             ),
           ],
         ),

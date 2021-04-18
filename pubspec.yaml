@@ -49,6 +49,8 @@ dependencies:
   multi_select_flutter: ^4.0.0
   outline_search_bar: ^2.1.1
   flutter_svg: ^0.21.0+1
+  shared_preferences: ^2.0.5
+  cloud_functions: ^1.0.3
 
 dev_dependencies:
   flutter_test:

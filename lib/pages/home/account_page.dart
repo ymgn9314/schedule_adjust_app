@@ -36,103 +36,89 @@ class AccountPage extends StatelessWidget {
                   context
                       .read<LoginAuthenticationController>()
                       .user!
-                      .displayName!
-                      .toString(),
+                      .displayName!,
                   style: const TextStyle(
                       fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  context.read<LoginAuthenticationController>().user!.uid,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.normal),
                 ),
               ],
             ),
             Column(
               children: [
-                SizedBox(
-                  height: 128,
-                  child: GridView.count(
-                    mainAxisSpacing: 8,
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      MaterialButton(
-                        color: Colors.red,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<AppDataController>()
+                            .applyColorThemeChange(0);
+                      },
+                      style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
-                        onPressed: () {
-                          context
-                              .read<AppDataController>()
-                              .applyColorThemeChange(
-                                  Colors.red, Colors.redAccent);
-                        },
+                        primary: Colors.red,
                       ),
-                      MaterialButton(
-                        color: Colors.orange,
+                      child: null,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<AppDataController>()
+                            .applyColorThemeChange(1);
+                      },
+                      style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
-                        onPressed: () {
-                          context
-                              .read<AppDataController>()
-                              .applyColorThemeChange(
-                                  Colors.orange, Colors.orangeAccent);
-                        },
+                        primary: Colors.deepOrange,
                       ),
-                      MaterialButton(
-                        color: Colors.yellow,
+                      child: null,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<AppDataController>()
+                            .applyColorThemeChange(2);
+                      },
+                      style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
-                        onPressed: () {
-                          context
-                              .read<AppDataController>()
-                              .applyColorThemeChange(
-                                  Colors.yellow, Colors.yellowAccent);
-                        },
+                        primary: Colors.green,
                       ),
-                      MaterialButton(
-                        color: Colors.green,
+                      child: null,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<AppDataController>()
+                            .applyColorThemeChange(3);
+                      },
+                      style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
-                        onPressed: () {
-                          context
-                              .read<AppDataController>()
-                              .applyColorThemeChange(
-                                  Colors.green, Colors.greenAccent);
-                        },
+                        primary: Colors.blue,
                       ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        shape: const CircleBorder(),
-                        onPressed: () {
-                          context
-                              .read<AppDataController>()
-                              .applyColorThemeChange(
-                                  Colors.blue, Colors.blueAccent);
-                        },
-                      ),
-                      MaterialButton(
-                        color: Colors.purple,
-                        shape: const CircleBorder(),
-                        onPressed: () {
-                          context
-                              .read<AppDataController>()
-                              .applyColorThemeChange(
-                                  Colors.purple, Colors.purpleAccent);
-                        },
-                      ),
-                      MaterialButton(
-                        color: Colors.pink,
-                        shape: const CircleBorder(),
-                        onPressed: () {
-                          context
-                              .read<AppDataController>()
-                              .applyColorThemeChange(
-                                  Colors.pink, Colors.pinkAccent);
-                        },
-                      ),
-                    ],
-                  ),
+                      child: null,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<AppDataController>().toggleDarkLightTheme();
-                  },
-                  child: const Text('ライト/ダークテーマ切り替え'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('テーマカラー切り替え'),
+                    Switch(
+                      value: context.read<AppDataController>().isDarkTheme,
+                      activeColor: Colors.grey[700],
+                      activeTrackColor: Colors.grey,
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: Colors.grey,
+                      onChanged: (isDark) {
+                        context
+                            .read<AppDataController>()
+                            .toggleDarkLightTheme();
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

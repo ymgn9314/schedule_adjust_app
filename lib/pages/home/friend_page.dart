@@ -9,10 +9,12 @@ import 'package:provider/provider.dart';
 class FriendPage extends StatelessWidget {
   static const id = 'friend_page';
 
-  Widget friendCard(UserData data) {
+  Widget friendCard(
+      {required UserData data, required void Function()? onLongPress}) {
     return Card(
       elevation: 4,
       child: ListTile(
+        onLongPress: onLongPress,
         leading: CircleAvatar(
           backgroundImage: NetworkImage(data.photoUrl),
         ),
@@ -67,11 +69,43 @@ class FriendPage extends StatelessWidget {
                   }
                   // データが取得できた
                   return friendCard(
-                    UserData(
+                    data: UserData(
                       uid: doc.id,
                       displayName: snapshot.data!.get('displayName') as String,
                       photoUrl: snapshot.data!.get('photoUrl') as String,
                     ),
+                    onLongPress: () {
+                      // 削除しますか？
+                      showDialog<void>(
+                        context: context,
+                        builder: (_) {
+                          return AlertDialog(
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                            ),
+                            title: const Text('削除しますか?'),
+                            content: const Text('削除した友達は検索から再度追加することができます'),
+                            actions: <Widget>[
+                              // ボタン領域
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('いいえ'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  context
+                                      .read<UserDataController>()
+                                      .deleteFriendFromFirestore(doc.id);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('はい'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   );
                 },
               );
@@ -97,6 +131,7 @@ class FriendPage extends StatelessWidget {
             Icon(
               Icons.person_add,
               size: 24,
+              color: Colors.white70,
             ),
           ],
         ),

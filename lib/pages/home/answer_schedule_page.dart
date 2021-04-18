@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:high_hat/controller/app_data_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/pages/home/view_answer_page.dart';
@@ -110,10 +109,12 @@ class _AnswerSelectorState extends State<AnswerSelector> {
 class AnswerSchedulePage extends StatelessWidget {
   static const id = 'answer_schedule_page';
 
-  AnswerSchedulePage(this._scheduleId);
+  AnswerSchedulePage(this._scheduleId, this._answerNumber);
 
   // schedulesoコレクションのスケジュールID
   final String _scheduleId;
+  // 回答済みの人数
+  final int _answerNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +147,7 @@ class AnswerSchedulePage extends StatelessWidget {
                     Navigator.of(context).push<void>(
                       MaterialPageRoute(
                         builder: (context) {
-                          return ViewAnswerPage(_scheduleId);
+                          return ViewAnswerPage(_scheduleId, _answerNumber);
                         },
                       ),
                     );

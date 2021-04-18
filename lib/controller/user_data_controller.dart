@@ -24,6 +24,29 @@ class UserDataController extends ChangeNotifier {
     );
   }
 
+  // firestoreから取得したユーザー情報から、Cardウィジェットを返す
+  Widget getUserCardFromFirestore(String uid) {
+    return FutureBuilder<UserData>(
+      future: getUserDataFromFirestore(uid),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return Container(
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(snapshot.data!.photoUrl),
+              ),
+              const SizedBox(width: 8),
+              Text(snapshot.data!.displayName),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   // 検索にヒットしたユーザー
   final hitUsers = LinkedHashSet<UserData>(
     equals: (lhs, rhs) => lhs == rhs,
@@ -98,6 +121,16 @@ class UserDataController extends ChangeNotifier {
         .set(
       <String, dynamic>{},
     );
+    notifyListeners();
+  }
+
+  void deleteFriendFromFirestore(String uid) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('friends')
+        .doc(uid)
+        .delete();
     notifyListeners();
   }
 

@@ -47,10 +47,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // テーマ等、アプリ全体に影響を及ぼす変更(AppDataController内で管理)
     // があればリビルドさせる
+    context.read<AppDataController>().loadSharedPreferenceTheme();
     return Consumer<AppDataController>(
       builder: (context, model, child) {
         return MaterialApp(
           theme: model.themeData,
+          debugShowCheckedModeBanner: false,
           builder: EasyLoading.init(),
           initialRoute: LoginCheckPage.id,
           routes: {

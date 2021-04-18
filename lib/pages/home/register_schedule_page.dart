@@ -67,6 +67,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
       'remarks': remarks,
       'createdAt': DateFormat('yyyy/MM/dd/HHmms').format(DateTime.now()),
       'ownerId': owner.uid,
+      'refCount': participantUsers.length,
     });
 
     for (final user in participantUsers) {
