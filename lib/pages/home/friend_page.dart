@@ -1,10 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
+import 'package:high_hat/local_db/friend_box/friend_box.dart';
 import 'package:high_hat/pages/home/search_friend_page.dart';
 import 'package:high_hat/util/user_data.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class FriendPage extends StatelessWidget {
   static const id = 'friend_page';
@@ -33,46 +34,26 @@ class FriendPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        // usersコレクション/uidドキュメント/friendsサブコレクションのstream
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .collection('friends')
-            .snapshots(),
-
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          // データが取得できてなければSizedBoxを返す
+      body: FutureBuilder<bool>(
+        future: context.read<UserDataController>().updateHiveFriendList(),
+        builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const SizedBox();
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
-
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              // 友達のuid
-              final doc = snapshot.data!.docs[index];
-
-              return StreamBuilder<DocumentSnapshot>(
-                // usersコレクションから友達の情報を取得
-                stream: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(doc.id)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  // データが取得できていなければ
-                  if (!snapshot.hasData) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  // データが取得できた
+          final friendBox = Hive.box<FriendBox>('friend_box');
+          return ValueListenableBuilder(
+            valueListenable: friendBox.listenable(),
+            builder: (context, Box<FriendBox> box, widget) {
+              return ListView.builder(
+                itemCount: box.length,
+                itemBuilder: (context, index) {
                   return friendCard(
                     data: UserData(
-                      uid: doc.id,
-                      displayName: snapshot.data!.get('displayName') as String,
-                      photoUrl: snapshot.data!.get('photoUrl') as String,
+                      uid: box.values.elementAt(index).uid,
+                      displayName: box.values.elementAt(index).displayName,
+                      photoUrl: box.values.elementAt(index).photoUrl,
                     ),
                     onLongPress: () {
                       // 削除しますか？
@@ -94,9 +75,8 @@ class FriendPage extends StatelessWidget {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  context
-                                      .read<UserDataController>()
-                                      .deleteFriendFromFirestore(doc.id);
+                                  // ローカルDBから削除
+                                  box.delete(box.values.elementAt(index).uid);
                                   Navigator.pop(context);
                                 },
                                 child: const Text('はい'),

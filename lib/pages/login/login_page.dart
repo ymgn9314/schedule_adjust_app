@@ -24,7 +24,7 @@ class LoginPage extends StatelessWidget {
             onPressed: () async {
               final result = await signInWithGoogle();
               // ログインに成功したらcontrollerに渡す
-              if (result!.user != null) {
+              if (result != null && result.user != null) {
                 // Firestoreにユーザー情報を登録
                 // TODO(ymgn): 本当は新規登録時のみやる
                 await FirebaseFirestore.instance
@@ -34,7 +34,6 @@ class LoginPage extends StatelessWidget {
                   'displayName': result.user!.displayName,
                   'photoUrl': result.user!.photoURL,
                 });
-
                 context
                     .read<LoginAuthenticationController>()
                     .login(result.user);

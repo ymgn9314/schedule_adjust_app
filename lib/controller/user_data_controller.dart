@@ -2,7 +2,9 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:high_hat/local_db/friend_box/friend_box.dart';
 import 'package:high_hat/util/user_data.dart';
+import 'package:hive/hive.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 class UserDataController extends ChangeNotifier {
@@ -22,6 +24,35 @@ class UserDataController extends ChangeNotifier {
       displayName: user.get('displayName') as String,
       photoUrl: user.get('photoUrl') as String,
     );
+  }
+
+  // ローカルDBの友達リストを更新したか？
+  bool isUpdateHiveFriendList = false;
+  // ローカルDB上の友達リストを更新する
+  // ローカルDB上の友達のuidの内、Firestoreに存在しないものはローカルDBから削除する
+  Future<bool> updateHiveFriendList() async {
+    // 更新していなければ更新する
+    if (!isUpdateHiveFriendList) {
+      final friendBox = Hive.box<FriendBox>('friend_box');
+      final friendUids = friendBox.values.map((e) => e.uid);
+      // ローカルDBに友達リストが存在する?
+      await Future.forEach<String>(
+        friendUids,
+        (uid) async {
+          final doc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .get();
+          // Firestoreに存在しなければローカルDBから削除する
+          if (!doc.exists) {
+            await friendBox.delete(uid);
+          }
+        },
+      );
+      isUpdateHiveFriendList = true;
+    }
+
+    return true;
   }
 
   // firestoreから取得したユーザー情報から、Cardウィジェットを返す
@@ -97,8 +128,8 @@ class UserDataController extends ChangeNotifier {
     // 前回の検索情報をクリアする
     hitUsers.clear();
     // 検索にヒットしたユーザーを取得
-    // searchValueが4文字以上のときに限定する
-    if (searchValue.length >= 4) {
+    // searchValueが6文字以上のときに限定する
+    if (searchValue.length >= 6) {
       userSet.forEach(
         (e) {
           // 文字列が含まれているか(小文字同士で比較)
@@ -112,16 +143,26 @@ class UserDataController extends ChangeNotifier {
   }
 
   void addFriendToFirestore(UserData user) {
-    // 友達をfirestoreに追加
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('friends')
-        .doc(user.uid)
-        .set(
-      <String, dynamic>{},
+    // // 友達をfirestoreに追加
+    // FirebaseFirestore.instance
+    //     .collection('users')
+    //     .doc(FirebaseAuth.instance.currentUser!.uid)
+    //     .collection('friends')
+    //     .doc(user.uid)
+    //     .set(
+    //   <String, dynamic>{},
+    // );
+    // notifyListeners();
+    //
+    // 友達をローカルDBに追加
+    Hive.box<FriendBox>('friend_box').put(
+      user.uid,
+      FriendBox(
+        uid: user.uid,
+        displayName: user.displayName,
+        photoUrl: user.photoUrl,
+      ),
     );
-    notifyListeners();
   }
 
   void deleteFriendFromFirestore(String uid) {

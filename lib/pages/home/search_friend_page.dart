@@ -1,9 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
+import 'package:high_hat/local_db/friend_box/friend_box.dart';
+import 'package:hive/hive.dart';
 import 'package:outline_search_bar/outline_search_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 // 友達検索ページ
 class SearchFriendPage extends StatelessWidget {
@@ -16,9 +17,8 @@ class SearchFriendPage extends StatelessWidget {
     return true;
   }
 
-  Widget searchBody(BuildContext context, QuerySnapshot snapshot) {
+  Widget searchBody(BuildContext context) {
     final controller = context.read<UserDataController>();
-
     return Column(
       children: [
         Padding(
@@ -27,42 +27,43 @@ class SearchFriendPage extends StatelessWidget {
             borderColor: Colors.transparent,
             elevation: 6,
             borderRadius: BorderRadius.circular(6),
-            hintText: 'ユーザーIDで検索',
+            hintText: 'ユーザーIDで検索(6文字以上入力)',
             onSearchButtonPressed: controller.searchFriend,
           ),
         ),
         Expanded(
           child: Consumer<UserDataController>(
             builder: (context, model, child) {
-              return ListView.builder(
-                itemCount: model.hitUsers.length,
-                itemBuilder: (context, index) {
-                  // インデックス番目のユーザー情報
-                  final user = model.hitUsers.elementAt(index);
-                  // 既に友達(または自分)かどうか
-                  final isAlreadyFriend = snapshot.docs
-                          .where((doc) => doc.id == user.uid)
-                          .isNotEmpty ||
-                      user.uid == FirebaseAuth.instance.currentUser!.uid;
-
-                  return Card(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(user.photoUrl),
-                      ),
-                      title: Text(user.displayName),
-                      trailing: TextButton(
-                        onPressed: isAlreadyFriend
-                            ? null
-                            : () {
-                                // 友達をfirestoreに追加
-                                controller.addFriendToFirestore(user);
-                              },
-                        child: isAlreadyFriend
-                            ? const Text('追加済み')
-                            : const Text('追加する'),
-                      ),
-                    ),
+              return ValueListenableBuilder(
+                valueListenable: Hive.box<FriendBox>('friend_box').listenable(),
+                builder: (context, Box<FriendBox> box, child) {
+                  return ListView.builder(
+                    itemCount: model.hitUsers.length,
+                    itemBuilder: (context, index) {
+                      // インデックス番目のユーザー情報
+                      final user = model.hitUsers.elementAt(index);
+                      // 既に友達(または自分)かどうか
+                      final isAlreadyFriend = box.get(user.uid) != null;
+                      return Card(
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(user.photoUrl),
+                          ),
+                          title: Text(user.displayName),
+                          trailing: TextButton(
+                            onPressed: isAlreadyFriend
+                                ? null
+                                : () {
+                                    // 友達をfirestoreに追加
+                                    controller.addFriendToFirestore(user);
+                                  },
+                            child: isAlreadyFriend
+                                ? const Text('追加済み')
+                                : const Text('追加する'),
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               );
@@ -98,24 +99,7 @@ class SearchFriendPage extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           }
-          return StreamBuilder<QuerySnapshot>(
-            // users/uid/friendsコレクション内のドキュメント一覧をstreamで取得
-            stream: FirebaseFirestore.instance
-                .collection('users')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .collection('friends')
-                .snapshots(),
-            builder: (context, snapshot) {
-              // firestoreからのデータ取得が完了していない
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              return searchBody(context, snapshot.data!);
-            },
-          );
-          // return searchBody(context, snapshot.data!);
+          return searchBody(context);
         },
       ),
     );

@@ -113,7 +113,7 @@ class ScheduleDataController extends ChangeNotifier {
       // return path?
       try {
         final result = await callable
-            .call<String>(<String, dynamic>{'path': '/schedules/$scheduleId'});
+            .call<dynamic>(<String, dynamic>{'path': '/schedules/$scheduleId'});
         print(result.data);
       } catch (e) {
         print('catch exception on cloud functions');

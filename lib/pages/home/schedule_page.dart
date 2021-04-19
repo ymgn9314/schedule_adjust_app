@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
-import 'package:high_hat/pages/home/account_page.dart';
 import 'package:high_hat/util/user_data.dart';
 import 'package:provider/provider.dart';
 
