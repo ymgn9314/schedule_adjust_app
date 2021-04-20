@@ -10,10 +10,10 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 class UserDataController extends ChangeNotifier {
   // Firestore上の全ユーザーリスト（uidを比較して重複を避ける）
   // アプリ起動時に一度だけ読み込む
-  LinkedHashSet<UserData> userSet = LinkedHashSet<UserData>(
-    equals: (lhs, rhs) => lhs == rhs,
-    hashCode: (data) => data.hashCode,
-  );
+  // LinkedHashSet<UserData> userSet = LinkedHashSet<UserData>(
+  //   equals: (lhs, rhs) => lhs == rhs,
+  //   hashCode: (data) => data.hashCode,
+  // );
 
   // firestoreから取得したユーザー情報を(UserData)返す
   Future<UserData> getUserDataFromFirestore(String uid) async {
@@ -95,15 +95,18 @@ class UserDataController extends ChangeNotifier {
     if (isFecthed) {
       return;
     }
+    final currentUser = FirebaseAuth.instance.currentUser!;
     Hive.box<FriendBox>('friend_box').values.forEach((e) {
-      registerPageAddFriendItems.add(MultiSelectItem(
-        UserData(
-          uid: e.uid,
-          displayName: e.displayName,
-          photoUrl: e.photoUrl,
-        ),
-        e.displayName,
-      ));
+      if (e.uid != currentUser.uid) {
+        registerPageAddFriendItems.add(MultiSelectItem(
+          UserData(
+            uid: e.uid,
+            displayName: e.displayName,
+            photoUrl: e.photoUrl,
+          ),
+          e.displayName,
+        ));
+      }
     });
     // final user = FirebaseAuth.instance.currentUser;
     // // users/uid/friendsのドキュメント一覧を取得
@@ -137,21 +140,32 @@ class UserDataController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void searchFriend(String searchValue) {
+  Future<void> searchFriend(String searchValue) async {
     // 前回の検索情報をクリアする
     hitUsers.clear();
-    // 検索にヒットしたユーザーを取得
-    // searchValueが6文字以上のときに限定する
-    if (searchValue.length >= 6) {
-      userSet.forEach(
-        (e) {
-          // 文字列が含まれているか(小文字同士で比較)
-          if (e.uid.toLowerCase().contains(searchValue.toLowerCase())) {
-            hitUsers.add(e);
-          }
-        },
+    // 検索にヒットしたユーザーを取得(完全一致)
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('userId', isEqualTo: searchValue)
+        .get();
+    snapshot.docs.forEach((hitUser) {
+      hitUsers.add(
+        UserData(
+          uid: hitUser.id,
+          displayName: hitUser.get('displayName') as String,
+          photoUrl: hitUser.get('photoUrl') as String,
+        ),
       );
-    }
+    });
+    // userSet.forEach(
+    //   (e) {
+    //     // 文字列が含まれているか(小文字同士で比較)
+    //     if (e.uid.toLowerCase().contains(searchValue.toLowerCase())) {
+    //       hitUsers.add(e);
+    //     }
+    //   },
+    // );
+
     notifyListeners();
   }
 
@@ -188,19 +202,19 @@ class UserDataController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchFirestoreUser() async {
-    final _firestore = FirebaseFirestore.instance;
-    final docs = await _firestore.collection('users').get();
-    // firestoreから全ユーザー情報を取得する
-    docs.docs.forEach((doc) {
-      userSet.add(
-        UserData(
-          uid: doc.id,
-          displayName: doc.get('displayName') as String,
-          photoUrl: doc.get('photoUrl') as String,
-        ),
-      );
-    });
-    notifyListeners();
-  }
+  // Future<void> fetchFirestoreUser() async {
+  //   final _firestore = FirebaseFirestore.instance;
+  //   final docs = await _firestore.collection('users').get();
+  //   // firestoreから全ユーザー情報を取得する
+  //   docs.docs.forEach((doc) {
+  //     userSet.add(
+  //       UserData(
+  //         uid: doc.id,
+  //         displayName: doc.get('displayName') as String,
+  //         photoUrl: doc.get('photoUrl') as String,
+  //       ),
+  //     );
+  //   });
+  //   notifyListeners();
+  // }
 }

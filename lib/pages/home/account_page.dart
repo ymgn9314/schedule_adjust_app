@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -40,10 +41,25 @@ class AccountPage extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 32, fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  context.read<LoginAuthenticationController>().user!.uid,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.normal),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(context
+                          .read<LoginAuthenticationController>()
+                          .user!
+                          .uid)
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Text('', style: TextStyle(fontSize: 16));
+                    }
+                    return Text(
+                      snapshot.data!.get('userId') as String,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.normal),
+                    );
+                  },
                 ),
               ],
             ),

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/local_db/friend_box/friend_box.dart';
@@ -20,7 +22,19 @@ class FriendPage extends StatelessWidget {
           backgroundImage: NetworkImage(data.photoUrl),
         ),
         title: Text(data.displayName),
-        subtitle: Text(data.uid),
+        subtitle: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(data.uid)
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return const Text('');
+            }
+            return Text(snapshot.data!.get('userId') as String);
+          },
+        ),
       ),
     );
   }
@@ -49,6 +63,11 @@ class FriendPage extends StatelessWidget {
               return ListView.builder(
                 itemCount: box.length,
                 itemBuilder: (context, index) {
+                  // 自分は保存しない
+                  if (box.values.elementAt(index).uid ==
+                      FirebaseAuth.instance.currentUser!.uid) {
+                    return const SizedBox();
+                  }
                   return friendCard(
                     data: UserData(
                       uid: box.values.elementAt(index).uid,

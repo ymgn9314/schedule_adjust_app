@@ -8,14 +8,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 // 友達検索ページ
 class SearchFriendPage extends StatelessWidget {
-  Future<bool> _fetchFirestoreUser(BuildContext context) async {
-    final controller = context.read<UserDataController>();
-    // Firestore上の全ユーザーを取得する(アプリ起動後初回のみ)
-    if (controller.userSet.isEmpty) {
-      await controller.fetchFirestoreUser();
-    }
-    return true;
-  }
+  // Future<bool> _fetchFirestoreUser(BuildContext context) async {
+  //   final controller = context.read<UserDataController>();
+  //   // Firestore上の全ユーザーを取得する(アプリ起動後初回のみ)
+  //   if (controller.userSet.isEmpty) {
+  //     await controller.fetchFirestoreUser();
+  //   }
+  //   return true;
+  // }
 
   Widget searchBody(BuildContext context) {
     final controller = context.read<UserDataController>();
@@ -27,7 +27,7 @@ class SearchFriendPage extends StatelessWidget {
             borderColor: Colors.transparent,
             elevation: 6,
             borderRadius: BorderRadius.circular(6),
-            hintText: 'ユーザーIDで検索(6文字以上入力)',
+            hintText: 'ユーザーIDで検索',
             onSearchButtonPressed: controller.searchFriend,
           ),
         ),
@@ -89,19 +89,20 @@ class SearchFriendPage extends StatelessWidget {
           ),
         ),
       ),
-      body: FutureBuilder(
-        // firestoreからユーザー情報を取得
-        future: _fetchFirestoreUser(context),
-        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          // firestoreからのデータ取得が完了していない
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return searchBody(context);
-        },
-      ),
+      body: searchBody(context),
+      // body: FutureBuilder(
+      //   // firestoreからユーザー情報を取得
+      //   future: _fetchFirestoreUser(context),
+      //   builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+      //     // firestoreからのデータ取得が完了していない
+      //     if (!snapshot.hasData) {
+      //       return const Center(
+      //         child: CircularProgressIndicator(),
+      //       );
+      //     }
+      //     return searchBody(context);
+      //   },
+      // ),
     );
   }
 }
