@@ -121,7 +121,7 @@ class FriendComponent extends StatelessWidget {
       ),
       deleteIcon: Icon(
         Icons.cancel,
-        color: Theme.of(context).buttonColor,
+        color: Colors.white,
       ),
       onDeleted: () {
         // ×ボタンが押されたら友達を削除する

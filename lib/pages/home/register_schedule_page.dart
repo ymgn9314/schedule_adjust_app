@@ -65,7 +65,7 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
     batch.set(schedulesDocReference, <String, dynamic>{
       'title': title,
       'remarks': remarks,
-      'createdAt': DateFormat('yyyy/MM/dd/HHmms').format(DateTime.now()),
+      'createdAt': DateFormat('yyyy/MM/dd/HH:mm:s').format(DateTime.now()),
       'ownerId': owner.uid,
       'refCount': participantUsers.length,
     });

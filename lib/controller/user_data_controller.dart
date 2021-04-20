@@ -92,28 +92,41 @@ class UserDataController extends ChangeNotifier {
   bool isFecthed = false;
 
   Future<void> fetchRegisterPageAddFriendItems() async {
-    final user = FirebaseAuth.instance.currentUser;
-    // users/uid/friendsのドキュメント一覧を取得
-    final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('friends')
-        .get();
-    registerPageAddFriendItems = await Future.wait(
-        snapshot.docs.map<Future<MultiSelectItem<UserData>>>((doc) async {
-      final user = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(doc.id)
-          .get();
-      return MultiSelectItem(
+    if (isFecthed) {
+      return;
+    }
+    Hive.box<FriendBox>('friend_box').values.forEach((e) {
+      registerPageAddFriendItems.add(MultiSelectItem(
         UserData(
-          uid: doc.id,
-          displayName: user.get('displayName') as String,
-          photoUrl: user.get('photoUrl') as String,
+          uid: e.uid,
+          displayName: e.displayName,
+          photoUrl: e.photoUrl,
         ),
-        user.get('displayName') as String,
-      );
-    }));
+        e.displayName,
+      ));
+    });
+    // final user = FirebaseAuth.instance.currentUser;
+    // // users/uid/friendsのドキュメント一覧を取得
+    // final snapshot = await FirebaseFirestore.instance
+    //     .collection('users')
+    //     .doc(user!.uid)
+    //     .collection('friends')
+    //     .get();
+    // registerPageAddFriendItems = await Future.wait(
+    //     snapshot.docs.map<Future<MultiSelectItem<UserData>>>((doc) async {
+    //   final user = await FirebaseFirestore.instance
+    //       .collection('users')
+    //       .doc(doc.id)
+    //       .get();
+    //   return MultiSelectItem(
+    //     UserData(
+    //       uid: doc.id,
+    //       displayName: user.get('displayName') as String,
+    //       photoUrl: user.get('photoUrl') as String,
+    //     ),
+    //     user.get('displayName') as String,
+    //   );
+    // }));
 
     isFecthed = true;
     notifyListeners();
