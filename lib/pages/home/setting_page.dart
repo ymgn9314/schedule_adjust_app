@@ -271,8 +271,13 @@ class _SettingPageState extends State<SettingPage> {
                                   print('catch error while delete account');
                                 }
                                 // 退会処理
-                                await FirebaseAuth.instance.currentUser!
-                                    .delete();
+                                try {
+                                  final user =
+                                      FirebaseAuth.instance.currentUser;
+                                  await user!.delete();
+                                } on Exception catch (e) {
+                                  print(e);
+                                }
 
                                 // ローディング表示消す
                                 await EasyLoading.dismiss();

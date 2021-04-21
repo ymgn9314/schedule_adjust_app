@@ -26,11 +26,15 @@ class FriendPage extends StatelessWidget {
           stream: FirebaseFirestore.instance
               .collection('users')
               .doc(data.uid)
-              .snapshots(),
+              .snapshots()
+              .handleError(() {}),
           builder:
               (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (!snapshot.hasData) {
-              return const Text('');
+            // エラーが起きたとき
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                !snapshot.data!.exists) {
+              return const Text('不明なユーザーID');
             }
             return Text(snapshot.data!.get('userId') as String);
           },

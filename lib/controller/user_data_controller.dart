@@ -17,13 +17,24 @@ class UserDataController extends ChangeNotifier {
 
   // firestoreから取得したユーザー情報を(UserData)返す
   Future<UserData> getUserDataFromFirestore(String uid) async {
-    final user =
-        await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    return UserData(
-      uid: uid,
-      displayName: user.get('displayName') as String,
-      photoUrl: user.get('photoUrl') as String,
-    );
+    try {
+      final user =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final exists = user.exists;
+
+      return UserData(
+        uid: uid,
+        displayName: exists ? user.get('displayName') as String : '不明なユーザー',
+        photoUrl: exists ? user.get('photoUrl') as String : '',
+      );
+    } on Exception catch (e) {
+      print(e);
+      return UserData(
+        uid: 'unknownUid',
+        displayName: '不明なユーザー',
+        photoUrl: '',
+      );
+    }
   }
 
   // ローカルDBの友達リストを更新したか？

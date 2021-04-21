@@ -49,11 +49,18 @@ class AccountPage extends StatelessWidget {
                           .read<LoginAuthenticationController>()
                           .user!
                           .uid)
-                      .snapshots(),
+                      .snapshots()
+                      .handleError(() {}),
                   builder: (BuildContext context,
                       AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Text('', style: TextStyle(fontSize: 16));
+                    if (snapshot.hasError ||
+                        !snapshot.hasData ||
+                        !snapshot.data!.exists) {
+                      return const Text(
+                        '不明なユーザーID',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.normal),
+                      );
                     }
                     return Text(
                       snapshot.data!.get('userId') as String,
