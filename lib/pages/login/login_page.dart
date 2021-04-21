@@ -27,10 +27,13 @@ class LoginPage extends StatelessWidget {
           SignInButton(
             Buttons.Google,
             onPressed: () async {
-              final result = await signInWithGoogle();
+              final result = await signInWithGoogle().catchError(print);
+
               // ログインに成功したらcontrollerに渡す
               if (result != null && result.user != null) {
                 // ローカルDBに保存する
+                print('open hive box in LoginPage');
+                await Hive.openBox<FriendBox>('friend_box');
                 await Hive.box<FriendBox>('friend_box').put(
                   result.user!.uid,
                   FriendBox(

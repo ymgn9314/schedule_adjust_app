@@ -40,9 +40,9 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
     final scheduleId = owner.uid + dateNow;
 
     // 予定のタイトル
-    final title = rController.titleForm.content;
+    final title = rController.title;
     // 予定の備考欄
-    final remarks = rController.remarksForm.content;
+    final remarks = rController.remarks;
 
     // バッチ書き込みする
     final batch = FirebaseFirestore.instance.batch();

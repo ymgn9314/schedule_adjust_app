@@ -14,6 +14,11 @@ class RegisterScheduleController extends ChangeNotifier {
   // 友達フォーム
   FriendForm friendForm = FriendForm();
 
+  FocusNode titleFocusNode = FocusNode();
+  FocusNode remarksFocusNode = FocusNode();
+  String title = '';
+  String remarks = '';
+
   // notifyListenersを呼び出す
   void callNotifyListeners() {
     notifyListeners();
