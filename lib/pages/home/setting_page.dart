@@ -59,7 +59,7 @@ class _SettingPageState extends State<SettingPage> {
                       controller: _controller,
                       maxLength: 10,
                       decoration: InputDecoration(
-                        labelText: '6文字以上(半角英数のみ)',
+                        labelText: '6文字以上(半角英数とアンダースコアのみ)',
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6)),
                       ),
@@ -68,8 +68,9 @@ class _SettingPageState extends State<SettingPage> {
                           return 'IDを入力してください';
                         } else if (value.length < 6) {
                           return '6文字以上入力してください';
-                        } else if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
-                          return '半角英数しか使用できません';
+                        } else if (!RegExp(r'^[a-zA-Z0-9_]+$')
+                            .hasMatch(value)) {
+                          return '半角英数とアンダースコアしか使用できません';
                         }
                         return null;
                       },

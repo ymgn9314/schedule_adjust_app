@@ -53,11 +53,16 @@ class AccountPage extends StatelessWidget {
                       .handleError(() {}),
                   builder: (BuildContext context,
                       AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.hasError ||
-                        !snapshot.hasData ||
-                        !snapshot.data!.exists) {
+                    if (snapshot.hasError || !snapshot.data!.exists) {
                       return const Text(
                         '不明なユーザーID',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.normal),
+                      );
+                    }
+                    if (!snapshot.hasData) {
+                      return const Text(
+                        '',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.normal),
                       );

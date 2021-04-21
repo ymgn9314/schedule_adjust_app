@@ -53,7 +53,7 @@ class AppDataController extends ChangeNotifier {
       accentColorBrightness: isDarkTheme ? Brightness.dark : Brightness.light,
       buttonColor: matColor[500],
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: matColor[400],
+        backgroundColor: matColor[600],
       ),
     );
     themeIndex = index;
