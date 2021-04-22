@@ -7,8 +7,8 @@ import 'package:high_hat/controller/app_data_controller.dart';
 import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:high_hat/local_db/friend_box/friend_box.dart';
 import 'package:high_hat/pages/login/login_check_page.dart';
-import 'package:high_hat/pages/login/login_page.dart';
 import 'package:hive/hive.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 class SettingPage extends StatefulWidget {
@@ -299,6 +299,36 @@ class _SettingPageState extends State<SettingPage> {
                   },
                   child: const Text('アカウント削除'),
                 ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text('その他', style: TextStyle(fontSize: 20)),
+            ),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      final info = await PackageInfo.fromPlatform();
+                      showLicensePage(
+                        context: context,
+                        applicationName: info.appName,
+                        applicationVersion: info.version,
+                        applicationIcon: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Image(
+                                image: AssetImage(
+                                    'assets/schedule_icon_transparent.png')),
+                          ),
+                        ),
+                        applicationLegalese: 'みんなでスケジュール調整',
+                      );
+                    },
+                    child: const Text('ライセンス')),
               ),
             ),
           ],

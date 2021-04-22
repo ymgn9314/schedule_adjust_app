@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:high_hat/controller/app_data_controller.dart';
 import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:high_hat/pages/home/setting_page.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +51,7 @@ class AccountPage extends StatelessWidget {
                       .handleError(() {}),
                   builder: (BuildContext context,
                       AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.hasError || !snapshot.data!.exists) {
+                    if (snapshot.hasError) {
                       return const Text(
                         '不明なユーザーID',
                         style: TextStyle(
@@ -63,6 +61,13 @@ class AccountPage extends StatelessWidget {
                     if (!snapshot.hasData) {
                       return const Text(
                         '',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.normal),
+                      );
+                    }
+                    if (!snapshot.data!.exists) {
+                      return const Text(
+                        '不明なユーザーID',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.normal),
                       );
