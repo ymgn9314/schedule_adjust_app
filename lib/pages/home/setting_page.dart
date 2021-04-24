@@ -80,9 +80,12 @@ class _SettingPageState extends State<SettingPage> {
                     child: ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
+                          final user = context
+                              .read<LoginAuthenticationController>()
+                              .user;
                           await FirebaseFirestore.instance
                               .collection('users')
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .doc(user!.uid)
                               .update(<String, dynamic>{
                             'userId': _controller.text
                           });
@@ -238,15 +241,13 @@ class _SettingPageState extends State<SettingPage> {
                               onPressed: () async {
                                 // ダイアログを閉じる
                                 Navigator.of(context).pop();
-                                context
-                                    .read<LoginAuthenticationController>()
-                                    .logout();
 
                                 // ローディング表示する
                                 await EasyLoading.show();
-
-                                final uid =
-                                    FirebaseAuth.instance.currentUser!.uid;
+                                final uid = context
+                                    .read<LoginAuthenticationController>()
+                                    .user!
+                                    .uid;
                                 // Hiveのデータを削除する
                                 await Hive.box<FriendBox>('friend_box')
                                     .deleteFromDisk();
@@ -255,6 +256,9 @@ class _SettingPageState extends State<SettingPage> {
                                     .collection('users')
                                     .doc(uid)
                                     .delete();
+                                context
+                                    .read<LoginAuthenticationController>()
+                                    .logout();
                                 try {
                                   final callable =
                                       FirebaseFunctions.instanceFor(
@@ -275,6 +279,7 @@ class _SettingPageState extends State<SettingPage> {
                                 try {
                                   final user =
                                       FirebaseAuth.instance.currentUser;
+                                  await FirebaseAuth.instance.signOut();
                                   await user!.delete();
                                 } on Exception catch (e) {
                                   print(e);

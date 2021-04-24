@@ -3,6 +3,9 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/login_authentication_controller.dart';
+import 'package:high_hat/controller/user_data_controller.dart';
+import 'package:provider/provider.dart';
 
 class ScheduleDataController extends ChangeNotifier {
   // firestoreから取得したスケジュールを格納する
@@ -12,17 +15,19 @@ class ScheduleDataController extends ChangeNotifier {
   bool isAnswer = false;
 
   // firestoreからスケジュール一覧を取得する
-  Future<bool> fetchSchedule(String _scheduleId) async {
+  Future<bool> fetchSchedule(BuildContext context, String _scheduleId) async {
     // 前回取得したスケジュールをクリアする
     schedules.clear();
     isAnswer = false;
+
+    final user = context.read<LoginAuthenticationController>().user;
 
     // 既に回答したかを取得
     final userDoc = await FirebaseFirestore.instance
         .collection('schedules')
         .doc(_scheduleId)
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(user!.uid)
         .get();
     isAnswer = userDoc.get('isAnswer') as bool;
 
@@ -31,7 +36,7 @@ class ScheduleDataController extends ChangeNotifier {
         .collection('schedules')
         .doc(_scheduleId)
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(user.uid)
         .collection('answers')
         .get();
 
@@ -43,13 +48,15 @@ class ScheduleDataController extends ChangeNotifier {
   }
 
   // 回答をfirestoreに送信する
-  Future<void> sendAnswer(String _scheduleId) async {
+  Future<void> sendAnswer(BuildContext context, String _scheduleId) async {
+    final user = context.read<LoginAuthenticationController>().user;
+
     // schedules/scheduleId/users/uid/answersコレクションの参照を取得
     final userDocRef = FirebaseFirestore.instance
         .collection('schedules')
         .doc(_scheduleId)
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
+        .doc(user!.uid);
 
     // バッチ書き込みする
     final batch = FirebaseFirestore.instance.batch();
@@ -67,7 +74,10 @@ class ScheduleDataController extends ChangeNotifier {
 
   // firestoreからスケジュールを削除する
   // 参照のみ削除、参照カウントが0になったらスケジュール本体も削除
-  Future<bool> deleteScheduleFromFirestore(String scheduleId) async {
+  Future<bool> deleteScheduleFromFirestore(
+      BuildContext context, String scheduleId) async {
+    final user = context.read<LoginAuthenticationController>().user;
+
     // /schedules/scheduleIdの参照
     final scheduleDocRef =
         FirebaseFirestore.instance.collection('schedules').doc(scheduleId);
@@ -75,7 +85,7 @@ class ScheduleDataController extends ChangeNotifier {
     // /users/uid/schedules/scheduleIdの参照
     final userScheduleDoc = FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(user!.uid)
         .collection('schedules')
         .doc(scheduleId);
 

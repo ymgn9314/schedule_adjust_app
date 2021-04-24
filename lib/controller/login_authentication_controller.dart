@@ -1,23 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:high_hat/util/user_data.dart';
 
 class LoginAuthenticationController extends ChangeNotifier {
-  // FirebaseAuth.instance.currentUserを保持しておく
   // ログイン・ログアウト時の画面遷移を検知するため
-  User? _user = FirebaseAuth.instance.currentUser;
+  UserData? user;
+  bool get isLogin => FirebaseAuth.instance.currentUser != null;
 
-  bool get isLogin => _user != null;
-  User? get user => _user;
-
-  bool login(User? user) {
-    _user = user;
+  bool login(UserData? user) {
+    this.user = user;
     notifyListeners();
-    return _user != null;
+    return this.user != null;
   }
 
   void logout() {
-    _user = null;
+    user = null;
     notifyListeners();
   }
 }

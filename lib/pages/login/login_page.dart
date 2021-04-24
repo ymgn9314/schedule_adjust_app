@@ -9,6 +9,7 @@ import 'package:high_hat/pages/term_policy/privacy_policy_page.dart';
 import 'package:high_hat/pages/term_policy/terms_of_use_page.dart';
 import 'package:high_hat/util/gen_random_string.dart';
 import 'package:high_hat/util/sign_in_func.dart';
+import 'package:high_hat/util/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -98,8 +99,8 @@ class LoginPage extends StatelessWidget {
                         user.uid,
                         FriendBox(
                             uid: user.uid,
-                            displayName: user.displayName!,
-                            photoUrl: user.photoURL!),
+                            displayName: user.displayName,
+                            photoUrl: user.photoUrl),
                       );
                       // Firestoreにユーザー情報を登録
                       // TODO(ymgn): 本当は新規登録時のみやる
@@ -108,7 +109,7 @@ class LoginPage extends StatelessWidget {
                           .doc(user.uid) // ドキュメントID == ユーザーID
                           .set(<String, dynamic>{
                         'displayName': user.displayName,
-                        'photoUrl': user.photoURL,
+                        'photoUrl': user.photoUrl,
                         'userId': randomString(6), // 適当なユーザーIDを付与する
                       });
                       context.read<LoginAuthenticationController>().login(user);
@@ -144,9 +145,13 @@ class LoginPage extends StatelessWidget {
                         'userId': randomString(6), // 適当なユーザーIDを付与する
                       },
                     );
-                    context
-                        .read<LoginAuthenticationController>()
-                        .login(result.user);
+                    context.read<LoginAuthenticationController>().login(
+                          UserData(
+                              uid: result.user!.uid,
+                              displayName: result.user!.displayName!,
+                              photoUrl: result.user!.photoURL!),
+                        );
+                    //.login(result.user);
                   }
                 },
               ),

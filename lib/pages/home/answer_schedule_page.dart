@@ -129,8 +129,9 @@ class AnswerSchedulePage extends StatelessWidget {
         ),
       ),
       body: FutureBuilder<bool>(
-        future:
-            context.read<ScheduleDataController>().fetchSchedule(_scheduleId),
+        future: context
+            .read<ScheduleDataController>()
+            .fetchSchedule(context, _scheduleId),
         builder: (context, snapshot) {
           // 取得が完了していない
           if (!snapshot.hasData) {
@@ -193,7 +194,7 @@ class AnswerSchedulePage extends StatelessWidget {
                           // firestoreに回答を送信する
                           await context
                               .read<ScheduleDataController>()
-                              .sendAnswer(_scheduleId);
+                              .sendAnswer(context, _scheduleId);
 
                           // 画面を抜ける？
                           Navigator.of(context).pop();

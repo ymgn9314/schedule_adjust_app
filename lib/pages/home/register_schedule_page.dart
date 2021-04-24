@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:high_hat/controller/register_schedule_controller.dart';
 import 'package:high_hat/util/user_data.dart';
 import 'package:intl/intl.dart';
@@ -18,14 +19,12 @@ class _RegisterSchedulePageState extends State<RegisterSchedulePage> {
 
   Future<void> registerScheduleAndPopNavigation(BuildContext context) async {
     // 予定を登録する
-    final user = FirebaseAuth.instance.currentUser;
+    final user = context.read<LoginAuthenticationController>().user;
     final rController = context.read<RegisterScheduleController>();
 
     // 予定作成者(オーナー)のUserData
     final owner = UserData(
-        uid: user!.uid,
-        displayName: user.displayName!,
-        photoUrl: user.photoURL!);
+        uid: user!.uid, displayName: user.displayName, photoUrl: user.photoUrl);
 
     // 参加者(オーナー含む)のUserData
     final participantUsers = rController.friendForm.selectedFriendSet

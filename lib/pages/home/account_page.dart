@@ -28,7 +28,7 @@ class AccountPage extends StatelessWidget {
                     context
                         .read<LoginAuthenticationController>()
                         .user!
-                        .photoURL!,
+                        .photoUrl,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -36,7 +36,7 @@ class AccountPage extends StatelessWidget {
                   context
                       .read<LoginAuthenticationController>()
                       .user!
-                      .displayName!,
+                      .displayName,
                   style: const TextStyle(
                       fontSize: 32, fontWeight: FontWeight.bold),
                 ),

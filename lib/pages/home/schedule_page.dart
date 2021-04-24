@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:high_hat/controller/schedule_data_controller.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/pages/Home/register_schedule_page.dart';
@@ -65,7 +66,8 @@ class SchedulePage extends StatelessWidget {
                         onPressed: () {
                           context
                               .read<ScheduleDataController>()
-                              .deleteScheduleFromFirestore(schedule.id);
+                              .deleteScheduleFromFirestore(
+                                  context, schedule.id);
                           Navigator.pop(context);
                         },
                         child: const Text('はい'),
@@ -84,6 +86,7 @@ class SchedulePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('SchedulePage#build()');
+    final user = context.read<LoginAuthenticationController>().user;
 
     return Scaffold(
       appBar: AppBar(
@@ -94,7 +97,7 @@ class SchedulePage extends StatelessWidget {
         // 自分のスケジュール一覧を取得する
         stream: FirebaseFirestore.instance
             .collection('users')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .doc(user!.uid)
             .collection('schedules')
             .snapshots(),
         builder:
@@ -148,7 +151,7 @@ class SchedulePage extends StatelessWidget {
           // firestoreから予定追加画面に表示する友達一覧をキャッシュする
           await context
               .read<UserDataController>()
-              .fetchRegisterPageAddFriendItems();
+              .fetchRegisterPageAddFriendItems(context);
 
           // 予定登録ページへ遷移
           await Navigator.of(context).push<void>(

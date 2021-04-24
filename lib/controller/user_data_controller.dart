@@ -6,6 +6,9 @@ import 'package:high_hat/local_db/friend_box/friend_box.dart';
 import 'package:high_hat/util/user_data.dart';
 import 'package:hive/hive.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:provider/provider.dart';
+
+import 'login_authentication_controller.dart';
 
 class UserDataController extends ChangeNotifier {
   // Firestore上の全ユーザーリスト（uidを比較して重複を避ける）
@@ -102,13 +105,14 @@ class UserDataController extends ChangeNotifier {
   // (一旦チェックせずにSchedulePage->RegisterSchedulePageへの遷移前に毎回取得)
   bool isFecthed = false;
 
-  Future<void> fetchRegisterPageAddFriendItems() async {
+  Future<void> fetchRegisterPageAddFriendItems(BuildContext context) async {
     if (isFecthed) {
       return;
     }
-    final currentUser = FirebaseAuth.instance.currentUser!;
+    final user = context.read<LoginAuthenticationController>().user;
+
     Hive.box<FriendBox>('friend_box').values.forEach((e) {
-      if (e.uid != currentUser.uid) {
+      if (e.uid != user!.uid) {
         registerPageAddFriendItems.add(MultiSelectItem(
           UserData(
             uid: e.uid,
@@ -119,28 +123,6 @@ class UserDataController extends ChangeNotifier {
         ));
       }
     });
-    // final user = FirebaseAuth.instance.currentUser;
-    // // users/uid/friendsのドキュメント一覧を取得
-    // final snapshot = await FirebaseFirestore.instance
-    //     .collection('users')
-    //     .doc(user!.uid)
-    //     .collection('friends')
-    //     .get();
-    // registerPageAddFriendItems = await Future.wait(
-    //     snapshot.docs.map<Future<MultiSelectItem<UserData>>>((doc) async {
-    //   final user = await FirebaseFirestore.instance
-    //       .collection('users')
-    //       .doc(doc.id)
-    //       .get();
-    //   return MultiSelectItem(
-    //     UserData(
-    //       uid: doc.id,
-    //       displayName: user.get('displayName') as String,
-    //       photoUrl: user.get('photoUrl') as String,
-    //     ),
-    //     user.get('displayName') as String,
-    //   );
-    // }));
 
     isFecthed = true;
     notifyListeners();
@@ -168,30 +150,11 @@ class UserDataController extends ChangeNotifier {
         ),
       );
     });
-    // userSet.forEach(
-    //   (e) {
-    //     // 文字列が含まれているか(小文字同士で比較)
-    //     if (e.uid.toLowerCase().contains(searchValue.toLowerCase())) {
-    //       hitUsers.add(e);
-    //     }
-    //   },
-    // );
 
     notifyListeners();
   }
 
   void addFriendToFirestore(UserData user) {
-    // // 友達をfirestoreに追加
-    // FirebaseFirestore.instance
-    //     .collection('users')
-    //     .doc(FirebaseAuth.instance.currentUser!.uid)
-    //     .collection('friends')
-    //     .doc(user.uid)
-    //     .set(
-    //   <String, dynamic>{},
-    // );
-    // notifyListeners();
-    //
     // 友達をローカルDBに追加
     Hive.box<FriendBox>('friend_box').put(
       user.uid,
@@ -203,29 +166,15 @@ class UserDataController extends ChangeNotifier {
     );
   }
 
-  void deleteFriendFromFirestore(String uid) {
+  void deleteFriendFromFirestore(BuildContext context, String uid) {
+    final user = context.read<LoginAuthenticationController>().user;
+
     FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(user!.uid)
         .collection('friends')
         .doc(uid)
         .delete();
     notifyListeners();
   }
-
-  // Future<void> fetchFirestoreUser() async {
-  //   final _firestore = FirebaseFirestore.instance;
-  //   final docs = await _firestore.collection('users').get();
-  //   // firestoreから全ユーザー情報を取得する
-  //   docs.docs.forEach((doc) {
-  //     userSet.add(
-  //       UserData(
-  //         uid: doc.id,
-  //         displayName: doc.get('displayName') as String,
-  //         photoUrl: doc.get('photoUrl') as String,
-  //       ),
-  //     );
-  //   });
-  //   notifyListeners();
-  // }
 }

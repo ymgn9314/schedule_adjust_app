@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:high_hat/controller/user_data_controller.dart';
 import 'package:high_hat/local_db/friend_box/friend_box.dart';
 import 'package:high_hat/pages/home/search_friend_page.dart';
@@ -67,9 +68,10 @@ class FriendPage extends StatelessWidget {
               return ListView.builder(
                 itemCount: box.length,
                 itemBuilder: (context, index) {
+                  final user =
+                      context.read<LoginAuthenticationController>().user;
                   // 自分は保存しない
-                  if (box.values.elementAt(index).uid ==
-                      FirebaseAuth.instance.currentUser!.uid) {
+                  if (box.values.elementAt(index).uid == user!.uid) {
                     return const SizedBox();
                   }
                   return friendCard(

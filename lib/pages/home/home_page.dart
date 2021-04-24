@@ -1,22 +1,53 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:high_hat/controller/bottom_navigation_controller.dart';
+import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:high_hat/pages/Home/account_page.dart';
 import 'package:high_hat/pages/Home/schedule_page.dart';
 import 'package:high_hat/pages/home/friend_page.dart';
+import 'package:high_hat/util/user_data.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
+  Future<bool> setUserData(BuildContext context) async {
+    // ログインしていなかったらログインする
+    if (context.read<LoginAuthenticationController>().user == null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      final exists = doc.exists;
+      context.read<LoginAuthenticationController>().user = UserData(
+        uid: doc.id,
+        displayName: exists ? doc.get('displayName') as String : '不明なユーザー',
+        photoUrl: exists ? doc.get('photoUrl') as String : '',
+      );
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     print('HomePage#build()');
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => BottomNavigationController(),
-        ),
-      ],
-      child: _HomePage(),
+    return FutureBuilder(
+      future: setUserData(context),
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (context) => BottomNavigationController(),
+            ),
+          ],
+          child: _HomePage(),
+        );
+      },
     );
   }
 }
