@@ -87,7 +87,7 @@ class LoginPage extends StatelessWidget {
                 SignInButton(
                   Buttons.Apple,
                   onPressed: () async {
-                    final user = await signInWithApple().catchError(print);
+                    final user = await signInWithApple();
 
                     // ログインに成功したらcontrollerに渡す
                     if (user != null) {
@@ -118,7 +118,7 @@ class LoginPage extends StatelessWidget {
               SignInButton(
                 Buttons.Google,
                 onPressed: () async {
-                  final result = await signInWithGoogle().catchError(print);
+                  final result = await signInWithGoogle();
 
                   // ログインに成功したらcontrollerに渡す
                   if (result != null && result.user != null) {

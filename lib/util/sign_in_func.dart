@@ -8,11 +8,21 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 Future<UserCredential?> signInWithGoogle() async {
   await EasyLoading.show();
 
+  print('signInWithGoogle()');
+
   try {
+    print('try in signInWithGoogle()');
+    final googleLogin = GoogleSignIn(scopes: [
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ]);
     // Trigger the authentication flow
-    final googleUser = await GoogleSignIn().signIn();
+    final googleUser = await googleLogin.signIn();
+    if (googleUser == null) {
+      return null;
+    }
     // Obtain the auth details from the request
-    final googleAuth = await googleUser!.authentication;
+    final googleAuth = await googleUser.authentication;
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -20,7 +30,8 @@ Future<UserCredential?> signInWithGoogle() async {
     );
     // Once signed in, return the UserCredential
     return FirebaseAuth.instance.signInWithCredential(credential);
-  } on Exception {
+  } catch (e) {
+    print('catch error in signInWithGoogle()');
     return null;
   } finally {
     await EasyLoading.dismiss();
@@ -29,8 +40,10 @@ Future<UserCredential?> signInWithGoogle() async {
 
 Future<User?> signInWithApple() async {
   await EasyLoading.show();
+  print('signInWithApple()');
 
   try {
+    print('try in signInWithApple()');
     final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: [
         AppleIDAuthorizationScopes.email,
@@ -46,7 +59,8 @@ Future<User?> signInWithApple() async {
     final authResult =
         await FirebaseAuth.instance.signInWithCredential(credential);
     return authResult.user;
-  } on Exception {
+  } catch (e) {
+    print('catch error in signInWithApple()');
     return null;
   } finally {
     await EasyLoading.dismiss();
