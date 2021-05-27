@@ -105,6 +105,29 @@ class UserDataController extends ChangeNotifier {
   // (一旦チェックせずにSchedulePage->RegisterSchedulePageへの遷移前に毎回取得)
   bool isFecthed = false;
 
+  Future<void> deleteRegisterPageAddFriendItems(String targetUid) async {
+    registerPageAddFriendItems
+        .removeWhere((element) => element.value.uid == targetUid);
+  }
+
+  Future<void> addRegisterPageAddFriendItems(
+      BuildContext context, UserData target) async {
+    final user = context.read<LoginAuthenticationController>().user;
+    if (target.uid != user!.uid) {
+      registerPageAddFriendItems.add(
+        MultiSelectItem(
+          UserData(
+            uid: target.uid,
+            displayName: target.displayName,
+            photoUrl: target.photoUrl,
+          ),
+          target.displayName,
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
   Future<void> fetchRegisterPageAddFriendItems(BuildContext context) async {
     if (isFecthed) {
       return;
@@ -112,7 +135,10 @@ class UserDataController extends ChangeNotifier {
     final user = context.read<LoginAuthenticationController>().user;
 
     Hive.box<FriendBox>('friend_box').values.forEach((e) {
-      if (e.uid != user!.uid) {
+      if (e.uid != user!.uid &&
+          registerPageAddFriendItems
+              .where((friend) => friend.value.uid == e.uid)
+              .isEmpty) {
         registerPageAddFriendItems.add(MultiSelectItem(
           UserData(
             uid: e.uid,

@@ -155,6 +155,45 @@ class LoginPage extends StatelessWidget {
                   }
                 },
               ),
+              SignInButton(
+                Buttons.Twitter,
+                onPressed: () async {
+                  final result = await signInWithTwitter();
+
+                  // ログインに成功したらcontrollerに渡す
+                  if (result != null) {
+                    // ローカルDBに保存する
+                    print('open hive box in LoginPage');
+                    await Hive.openBox<FriendBox>('friend_box');
+                    await Hive.box<FriendBox>('friend_box').put(
+                      result.uid,
+                      FriendBox(
+                          uid: result.uid,
+                          displayName: result.displayName,
+                          photoUrl: result.photoUrl),
+                    );
+                    // Firestoreにユーザー情報を登録
+                    // TODO(ymgn): 本当は新規登録時のみやる
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(result.uid) // ドキュメントID == ユーザーID
+                        .set(
+                      <String, dynamic>{
+                        'displayName': result.displayName,
+                        'photoUrl': result.photoUrl,
+                        'userId': randomString(6), // 適当なユーザーIDを付与する
+                      },
+                    );
+                    context.read<LoginAuthenticationController>().login(
+                          UserData(
+                              uid: result.uid,
+                              displayName: result.displayName,
+                              photoUrl: result.photoUrl),
+                        );
+                    //.login(result.user);
+                  }
+                },
+              ),
             ],
           ),
         ],

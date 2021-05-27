@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -30,16 +30,16 @@ dependencies:
   provider: ^5.0.0
 
   # Add the dependency for the Firebase Core Flutter SDK
-  firebase_core: ^1.0.2
+  firebase_core: ^1.0.4
 
   # Add the dependency for the FlutterFire plugin for Google Analytics
-  firebase_analytics: ^7.1.1
+  firebase_analytics: ^8.0.1
 
   # Add the dependencies for any other Firebase products you want to use in your app
   # For example, to use Firebase Authentication and Cloud Firestore
-  firebase_auth: ^1.0.1
-  cloud_firestore: ^1.0.2
-  google_sign_in: ^5.0.1
+  firebase_auth: ^1.1.1
+  cloud_firestore: ^1.0.6
+  google_sign_in: ^5.0.2
   sign_in_with_apple: ^3.0.0
   flutter_signin_button: ^2.0.0-nullsafety.0
   flutter_easyloading: ^3.0.0
@@ -51,6 +51,11 @@ dependencies:
   flutter_svg: ^0.21.0+1
   shared_preferences: ^2.0.5
   cloud_functions: ^1.0.3
+  hive: ^2.0.3
+  hive_flutter: ^1.0.0
+  package_info: ^2.0.0
+  flutter_markdown: any
+  twitter_login: ^3.0.6
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +63,15 @@ dev_dependencies:
 
   pedantic_mono: any
   flutter_native_splash: ^1.1.5+1
+  hive_generator: ^1.0.1
+  build_runner: ^1.12.2
+  flutter_launcher_icons: ^0.9.0
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/schedule_app_icon.png"
+  adaptive_icon_background: "#ffffff"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -75,6 +89,10 @@ flutter:
     - circle.svg
     - cross.svg
     - triangle.svg
+    - schedule_icon_transparent.png
+    - schedule_app_icon.png
+    - terms_of_use.md
+    - privacy_policy.md
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -103,4 +121,5 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 
 flutter_native_splash:
-  color: "#42a5f5"
+  color: "#f8f8ff"
+  image: "assets/schedule_icon_transparent.png"

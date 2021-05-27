@@ -6,6 +6,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:high_hat/util/user_data.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:twitter_login/twitter_login.dart';
 
 Future<UserCredential?> signInWithGoogle() async {
   await EasyLoading.show();
@@ -80,9 +81,6 @@ Future<UserData?> signInWithApple() async {
         'try in get apple signin user data(uid: ${user.uid}, exists: $exists)',
       );
 
-      final disp = doc.get('displayName') as String;
-      print(disp);
-
       return UserData(
         uid: doc.id,
         displayName: doc.get('displayName') as String,
@@ -103,4 +101,43 @@ Future<UserData?> signInWithApple() async {
   } finally {
     await EasyLoading.dismiss();
   }
+}
+
+Future<UserData?> signInWithTwitter() async {
+  final twitterLogin = TwitterLogin(
+    // Consumer API keys
+    apiKey: 'Gv0F0jj584IpTnU1ar1bOarY8',
+    // Consumer API Secret keys
+    apiSecretKey: '8Xomm3tsvvY7Dz49C1bTLjbH55nf1to0xsDWHsiuRKyh8ONA3W',
+    // Registered Callback URLs in TwitterApp
+    // Android is a deeplink
+    // iOS is a URLScheme
+    redirectURI: 'schedule-app://',
+  );
+  // print('twitter login');
+  try {
+    final authResult = await twitterLogin.login();
+    if (authResult.status == TwitterLoginStatus.loggedIn) {
+      // success
+      final credential = TwitterAuthProvider.credential(
+        accessToken: authResult.authToken!,
+        secret: authResult.authTokenSecret!,
+      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      final user = FirebaseAuth.instance.currentUser;
+
+      //print('screenName is ${authResult.user!.screenName}');
+      //print('name is ${authResult.user!.name}');
+
+      return UserData(
+        uid: user!.uid,
+        displayName: user.displayName!,
+        photoUrl: user.photoURL!.replaceAll('normal.', '200x200.'),
+      );
+    }
+  } catch (e) {
+    print('catch error in twitter login');
+    return null;
+  }
+  return null;
 }

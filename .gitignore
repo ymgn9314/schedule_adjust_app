@@ -47,3 +47,7 @@ ios/Runner/*.plist
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json

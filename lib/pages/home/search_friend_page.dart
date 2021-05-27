@@ -56,6 +56,9 @@ class SearchFriendPage extends StatelessWidget {
                                 : () {
                                     // 友達をfirestoreに追加
                                     controller.addFriendToFirestore(user);
+                                    // 予定追加ページの友達フォームに追加
+                                    controller.addRegisterPageAddFriendItems(
+                                        context, user);
                                   },
                             child: isAlreadyFriend
                                 ? const Text('追加済み')
