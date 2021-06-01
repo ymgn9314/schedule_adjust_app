@@ -27,7 +27,10 @@ class User {
   UserProfileId _userProfileId;
   // アバターurl
   AvatarUrl _avatarUrl;
-  // 友達
+
+  // TODO(ymgn9314): 削除する
+  /// Deprecated: Userクラスでは友達の情報を持たないようにし、今後はrepositoryから取得するようにする
+  @deprecated
   UserFriend _userFriend;
   // スケジュールに対する回答
   AnswersToSchedule _answersToSchedule;
