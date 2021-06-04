@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		079E758A2669E82C0053F5A2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 079E75892669E82C0053F5A2 /* GoogleService-Info.plist */; };
-		079E758C2669E86D0053F5A2 /* GoogleService-Info-release.plist in Resources */ = {isa = PBXBuildFile; fileRef = 079E758B2669E86D0053F5A2 /* GoogleService-Info-release.plist */; };
-		079E758E2669E8790053F5A2 /* GoogleService-Info-dev.plist in Resources */ = {isa = PBXBuildFile; fileRef = 079E758D2669E8790053F5A2 /* GoogleService-Info-dev.plist */; };
+		076DED9D266A00BB00ED427A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 076DED9C266A00BB00ED427A /* GoogleService-Info.plist */; };
+		076DEDA0266A00FA00ED427A /* GoogleService-Info-dev.plist in Resources */ = {isa = PBXBuildFile; fileRef = 076DED9E266A00FA00ED427A /* GoogleService-Info-dev.plist */; };
+		076DEDA1266A00FA00ED427A /* GoogleService-Info-release.plist in Resources */ = {isa = PBXBuildFile; fileRef = 076DED9F266A00FA00ED427A /* GoogleService-Info-release.plist */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -34,9 +34,9 @@
 
 /* Begin PBXFileReference section */
 		070C36C2260DDCAE00A7826E /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
-		079E75892669E82C0053F5A2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		079E758B2669E86D0053F5A2 /* GoogleService-Info-release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info-release.plist"; path = "../../../../Downloads/release/GoogleService-Info-release.plist"; sourceTree = "<group>"; };
-		079E758D2669E8790053F5A2 /* GoogleService-Info-dev.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info-dev.plist"; path = "../../../../Downloads/dev/GoogleService-Info-dev.plist"; sourceTree = "<group>"; };
+		076DED9C266A00BB00ED427A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		076DED9E266A00FA00ED427A /* GoogleService-Info-dev.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-dev.plist"; sourceTree = "<group>"; };
+		076DED9F266A00FA00ED427A /* GoogleService-Info-release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-release.plist"; sourceTree = "<group>"; };
 		0EE84BE0D71303E257938FB3 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
@@ -101,9 +101,9 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
-				079E75892669E82C0053F5A2 /* GoogleService-Info.plist */,
-				079E758D2669E8790053F5A2 /* GoogleService-Info-dev.plist */,
-				079E758B2669E86D0053F5A2 /* GoogleService-Info-release.plist */,
+				076DED9E266A00FA00ED427A /* GoogleService-Info-dev.plist */,
+				076DED9F266A00FA00ED427A /* GoogleService-Info-release.plist */,
+				076DED9C266A00BB00ED427A /* GoogleService-Info.plist */,
 				070C36C2260DDCAE00A7826E /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -201,10 +201,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
-				079E758E2669E8790053F5A2 /* GoogleService-Info-dev.plist in Resources */,
+				076DEDA0266A00FA00ED427A /* GoogleService-Info-dev.plist in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
-				079E758C2669E86D0053F5A2 /* GoogleService-Info-release.plist in Resources */,
-				079E758A2669E82C0053F5A2 /* GoogleService-Info.plist in Resources */,
+				076DEDA1266A00FA00ED427A /* GoogleService-Info-release.plist in Resources */,
+				076DED9D266A00BB00ED427A /* GoogleService-Info.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 			);
