@@ -49,8 +49,8 @@ ios/Runner/*.plist
 /android/app/release
 
 # Firebase
-ios/Runner/GoogleService-Info.plist
-android/app/google-services.json
+android/app/src/debug/google-services.json
+android/app/src/release/google-services.json
 
 # FVM
 .fvm/flutter_sdk
