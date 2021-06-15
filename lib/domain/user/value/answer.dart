@@ -6,10 +6,3 @@ enum Answer {
   either, // △
   ng, // ×
 }
-
-@immutable
-class AnswerToDate {
-  const AnswerToDate(this.value);
-
-  final Map<ScheduleDate, Answer> value;
-}
