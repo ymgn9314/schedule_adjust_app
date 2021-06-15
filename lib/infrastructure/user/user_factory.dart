@@ -1,4 +1,3 @@
-import 'package:high_hat/common/helper/helpers.dart';
 import 'package:high_hat/domain/schedule/value/schedule_date.dart';
 import 'package:high_hat/domain/schedule/value/schedule_id.dart';
 import 'package:high_hat/domain/user/user.dart';
@@ -12,6 +11,7 @@ import 'package:high_hat/domain/user/value/user_profile_id.dart';
 class UserFactory implements UserFactoryBase {
   @override
   User create({
+    required String userId,
     required String userName,
     required String userProfileId,
     required String avatarUrl,
@@ -19,7 +19,7 @@ class UserFactory implements UserFactoryBase {
     required Map<String, Map<DateTime, Answer>> answersToSchedule,
   }) {
     return User(
-      id: UserId(Helpers.userId ?? ''),
+      id: UserId(userId),
       userName: UserName(userName),
       userProfileId: UserProfileId(userProfileId),
       avatarUrl: AvatarUrl(avatarUrl),

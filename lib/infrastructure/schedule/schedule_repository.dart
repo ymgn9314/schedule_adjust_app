@@ -18,7 +18,6 @@ class ScheduleRepository implements ScheduleRepositoryBase {
 
   @override
   Future<Schedule?> find(ScheduleId id) async {
-    // schedulesコレクションからドキュメントを取得する
     DocumentSnapshot snapshot;
     final doc = _db.doc('public/schedule/schedule_v1/${id.value}');
 
@@ -59,7 +58,6 @@ class ScheduleRepository implements ScheduleRepositoryBase {
   Future<List<Schedule>> findAll() async {
     final scheduleList = <Schedule>[];
 
-    // schedulesコレクションからドキュメントを取得する
     DocumentSnapshot snapshot;
     final doc = _db.doc('public/user/user_v1/$_userId');
 
@@ -123,6 +121,7 @@ class ScheduleRepository implements ScheduleRepositoryBase {
 
   @override
   Future<void> saveSchedule(Schedule schedule) async {
+    // スケジュール本体を作成
     await _db
         .doc('public/schedule/schedule_v1/${schedule.id.value}')
         .set(<String, dynamic>{
@@ -135,6 +134,22 @@ class ScheduleRepository implements ScheduleRepositoryBase {
       'scheduleList': FieldValue.arrayUnion(
           schedule.scheduleList.map((e) => e.value).toList()),
     });
+
+    // 各ユーザーにスケジュールを追加
+    final scheduleMap = Map.fromIterables(
+      schedule.scheduleList.map((e) => e.value).toList(),
+      List.filled(schedule.scheduleList.length, 1), // △で埋める
+    );
+
+    for (final user in schedule.userList) {
+      await _db.doc('public/user/user_v1/${user.value}').set(
+        <String, dynamic>{
+          'schedule': <String, dynamic>{
+            schedule.id.value: scheduleMap,
+          },
+        },
+      );
+    }
   }
 
   @override

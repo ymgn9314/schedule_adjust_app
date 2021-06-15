@@ -5,6 +5,7 @@ import 'package:high_hat/domain/user/value/answer.dart';
 // ignore: one_member_abstracts
 abstract class UserFactoryBase {
   User create({
+    required String userId,
     required String userName,
     required String userProfileId,
     required String avatarUrl,

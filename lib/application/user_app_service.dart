@@ -20,11 +20,13 @@ class UserAppService {
 
   // ユーザーを作成(Firestoreに登録)
   Future<void> create({
+    required String userId,
     required String userName,
     required String userProfileId,
     required String avatarUrl,
   }) async {
     final user = _userFactory.create(
+      userId: userId,
       userName: userName,
       userProfileId: userProfileId,
       avatarUrl: avatarUrl,
@@ -36,11 +38,7 @@ class UserAppService {
 
   // ユーザーを退会(Firestoreから削除)
   Future<void> delete(UserId id) async {
-    final user = await _userRepository.findByUserId(id);
-    if (user == null) {
-      throw Exception('User(findByUserId) not found');
-    }
-    await _userRepository.delete(user);
+    await _userRepository.delete(id);
   }
 
   // ユーザーを検索(プロフィールIDによる検索、重複あり)
@@ -51,20 +49,12 @@ class UserAppService {
 
   // ユーザーを友達に追加
   Future<void> addToFriend(UserId id) async {
-    final user = await _userRepository.findByUserId(id);
-    if (user == null) {
-      throw Exception('User(findByUserId) not found');
-    }
-    await _userRepository.addToFriend(user);
+    await _userRepository.addToFriend(id);
   }
 
   // ユーザーを友達から削除
   Future<void> deleteFromFriend(UserId id) async {
-    final user = await _userRepository.findByUserId(id);
-    if (user == null) {
-      throw Exception('User(findByUserId) not found');
-    }
-    await _userRepository.deleteFromFriend(user);
+    await _userRepository.deleteFromFriend(id);
   }
 
   // 友達一覧を取得

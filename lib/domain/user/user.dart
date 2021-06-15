@@ -32,4 +32,18 @@ class User {
   List<UserId> _userFriend;
   // スケジュールに対する回答
   Map<ScheduleId, Map<ScheduleDate, Answer>> _answersToSchedule;
+
+  UserName get userName => _userName;
+  UserProfileId get userProfileId => _userProfileId;
+  AvatarUrl get avatarUrl => _avatarUrl;
+  List<UserId> get userFriend => _userFriend;
+  Map<ScheduleId, Map<ScheduleDate, Answer>> get answerToSchedule =>
+      _answersToSchedule;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is User && other.id == id);
+
+  @override
+  int get hashCode => runtimeType.hashCode ^ id.hashCode;
 }
