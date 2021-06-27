@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:high_hat/common/helper/helpers.dart';
 import 'package:high_hat/domain/schedule/schedule.dart';
@@ -6,7 +8,6 @@ import 'package:high_hat/domain/schedule/value/schedule_date.dart';
 import 'package:high_hat/domain/schedule/value/schedule_remarks.dart';
 import 'package:high_hat/domain/schedule/value/schedule_title.dart';
 import 'package:high_hat/domain/schedule/value/schedule_id.dart';
-import 'package:high_hat/domain/user/value/answer.dart';
 import 'package:high_hat/domain/user/value/avatar_url.dart';
 import 'package:high_hat/domain/user/value/user_id.dart';
 
@@ -17,7 +18,7 @@ class ScheduleRepository implements ScheduleRepositoryBase {
   final _userId = Helpers.userId ?? '';
 
   @override
-  Future<Schedule?> find(ScheduleId id) async {
+  Future<Schedule?> fetch(ScheduleId id) async {
     DocumentSnapshot snapshot;
     final doc = _db.doc('public/schedule/schedule_v1/${id.value}');
 
@@ -33,7 +34,7 @@ class ScheduleRepository implements ScheduleRepositoryBase {
     }
     final data = snapshot.data()!;
 
-    final _ownerUrl = AvatarUrl(data['ownerUrl'] as String);
+    final _ownerUrl = AvatarUrl(data['ownerPhotoUrl'] as String);
     final _title = ScheduleTitle(data['title'] as String);
     final _remarks = ScheduleRemarks(data['remarks'] as String);
     final _scheduleList = List<Timestamp>.from(data['scheduleList'] as List)
@@ -44,6 +45,10 @@ class ScheduleRepository implements ScheduleRepositoryBase {
         .map((e) => UserId(e))
         .toList();
 
+    final _answerUserList = List<String>.from(data['answerUserList'] as List)
+        .map((e) => UserId(e))
+        .toList();
+
     return Schedule(
       id: id,
       ownerUrl: _ownerUrl,
@@ -51,11 +56,12 @@ class ScheduleRepository implements ScheduleRepositoryBase {
       remarks: _remarks,
       scheduleList: _scheduleList,
       userList: _userList,
+      answerUserList: _answerUserList,
     );
   }
 
   @override
-  Future<List<Schedule>> findAll() async {
+  Future<List<Schedule>> fetchAll() async {
     final scheduleList = <Schedule>[];
 
     DocumentSnapshot snapshot;
@@ -75,7 +81,7 @@ class ScheduleRepository implements ScheduleRepositoryBase {
     final scheduleIdItr = (data['schedule'] as Map<String, dynamic>).keys;
 
     for (final id in scheduleIdItr) {
-      final foundSchedule = await find(ScheduleId(id));
+      final foundSchedule = await fetch(ScheduleId(id));
       if (foundSchedule != null) {
         scheduleList.add(foundSchedule);
       }
@@ -85,7 +91,42 @@ class ScheduleRepository implements ScheduleRepositoryBase {
   }
 
   @override
-  Future<Schedule?> findByTitle(ScheduleTitle title) async {
+  Stream<List<ScheduleId>> fetchScheduleIdListStream() {
+    return _db.doc('public/user/user_v1/$_userId').snapshots().asyncMap(
+      (snapshot) {
+        if (!snapshot.exists) {
+          return <ScheduleId>[];
+        }
+
+        final data = snapshot.data()!;
+
+        return (data['schedule'] as Map<String, dynamic>)
+            .keys
+            .map((e) => ScheduleId(e))
+            .toList();
+      },
+    );
+  }
+
+  @override
+  Stream<Schedule?> fetchScheduleStream(ScheduleId id) {
+    return _db
+        .doc('public/schedule/schedule_v1/${id.value}')
+        .snapshots()
+        .asyncMap(
+      (snapshot) async {
+        if (!snapshot.exists) {
+          return null;
+        }
+
+        final schedule = await fetch(id);
+        return schedule;
+      },
+    );
+  }
+
+  @override
+  Future<Schedule?> fetchByTitle(ScheduleTitle title) async {
     // TODO: implement findByTitle
     throw UnimplementedError();
   }
@@ -108,9 +149,20 @@ class ScheduleRepository implements ScheduleRepositoryBase {
     }
     final data = snapshot.data()!;
 
+    // スケジュールを削除
     final scheduleMap = data['schedule'] as Map<String, dynamic>
       ..remove(schedule.id.value);
-    await doc.update(<String, dynamic>{'schedule': scheduleMap});
+
+    // コメントを削除
+    final commentMap = data['comment'] as Map<String, dynamic>
+      ..remove(schedule.id.value);
+
+    await doc.update(
+      <String, dynamic>{
+        'schedule': scheduleMap,
+        'comment': commentMap,
+      },
+    );
   }
 
   @override
@@ -128,39 +180,26 @@ class ScheduleRepository implements ScheduleRepositoryBase {
       'ownerPhotoUrl': schedule.ownerUrl.value,
       'remarks': schedule.remarks.value,
       'title': schedule.title.value,
-      'userNumber': schedule.userList.length,
+      'answerUserList': FieldValue.arrayUnion(<String>[]),
       'userList':
           FieldValue.arrayUnion(schedule.userList.map((e) => e.value).toList()),
-      'scheduleList': FieldValue.arrayUnion(
-          schedule.scheduleList.map((e) => e.value).toList()),
+      'scheduleList': FieldValue.arrayUnion(schedule.scheduleList
+          .map((e) => Timestamp.fromDate(e.value))
+          .toList()),
     });
 
     // 各ユーザーにスケジュールを追加
-    final scheduleMap = Map.fromIterables(
-      schedule.scheduleList.map((e) => e.value).toList(),
-      List.filled(schedule.scheduleList.length, 1), // △で埋める
-    );
+    final scheduleList = List.generate(schedule.scheduleList.length, (_) => 1);
 
     for (final user in schedule.userList) {
       await _db.doc('public/user/user_v1/${user.value}').set(
         <String, dynamic>{
           'schedule': <String, dynamic>{
-            schedule.id.value: scheduleMap,
+            schedule.id.value: scheduleList,
           },
         },
+        SetOptions(merge: true),
       );
     }
-  }
-
-  @override
-  Future<void> saveScheduleAnswer(
-      ScheduleId id, Map<ScheduleDate, Answer> answer) async {
-    final answerForStrage =
-        answer.map((key, value) => MapEntry(key.value.toString(), value.index));
-    await _db.doc('public/user/user_v1/${id.value}').update(
-      <String, dynamic>{
-        'schedule/${id.value}': answerForStrage,
-      },
-    );
   }
 }

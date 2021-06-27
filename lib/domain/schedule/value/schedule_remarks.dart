@@ -4,8 +4,8 @@ import 'package:meta/meta.dart';
 @immutable
 class ScheduleRemarks {
   ScheduleRemarks(this.value) {
-    if (value.length > 20) {
-      throw Exception('Schedule remarks length must be <=20.');
+    if (value.length > 300) {
+      throw Exception('Schedule remarks length must be <=300.');
     }
   }
 

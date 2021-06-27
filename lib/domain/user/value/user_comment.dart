@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 @immutable
-class ScheduleDate {
-  const ScheduleDate(this.value);
+class UserComment {
+  const UserComment(this.value);
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is ScheduleDate && other.value == value);
+      identical(this, other) || (other is UserComment && other.value == value);
 
   @override
   int get hashCode => runtimeType.hashCode ^ value.hashCode;
 
-  final DateTime value;
+  final String value;
 }

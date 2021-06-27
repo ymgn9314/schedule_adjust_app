@@ -1,7 +1,7 @@
-import 'package:high_hat/domain/schedule/value/schedule_date.dart';
 import 'package:high_hat/domain/schedule/value/schedule_id.dart';
 import 'package:high_hat/domain/user/value/answer.dart';
 import 'package:high_hat/domain/user/value/avatar_url.dart';
+import 'package:high_hat/domain/user/value/user_comment.dart';
 import 'package:high_hat/domain/user/value/user_id.dart';
 import 'package:high_hat/domain/user/value/user_name.dart';
 import 'package:high_hat/domain/user/value/user_profile_id.dart';
@@ -13,12 +13,14 @@ class User {
     required UserProfileId userProfileId,
     required AvatarUrl avatarUrl,
     required List<UserId> userFriend,
-    required Map<ScheduleId, Map<ScheduleDate, Answer>> answersToSchedule,
+    required Map<ScheduleId, List<Answer>> answersToSchedule,
+    required Map<ScheduleId, UserComment> scheduleComment,
   })  : _userName = userName,
         _userProfileId = userProfileId,
         _avatarUrl = avatarUrl,
         _userFriend = userFriend,
-        _answersToSchedule = answersToSchedule;
+        _answersToSchedule = answersToSchedule,
+        _scheduleComment = scheduleComment;
 
   // 識別子
   final UserId id;
@@ -31,14 +33,16 @@ class User {
   // 友達
   List<UserId> _userFriend;
   // スケジュールに対する回答
-  Map<ScheduleId, Map<ScheduleDate, Answer>> _answersToSchedule;
+  Map<ScheduleId, List<Answer>> _answersToSchedule;
+  // スケジュールごとのコメント
+  Map<ScheduleId, UserComment> _scheduleComment;
 
   UserName get userName => _userName;
   UserProfileId get userProfileId => _userProfileId;
   AvatarUrl get avatarUrl => _avatarUrl;
   List<UserId> get userFriend => _userFriend;
-  Map<ScheduleId, Map<ScheduleDate, Answer>> get answerToSchedule =>
-      _answersToSchedule;
+  Map<ScheduleId, List<Answer>> get answerToSchedule => _answersToSchedule;
+  Map<ScheduleId, UserComment> get scheduleComment => _scheduleComment;
 
   @override
   bool operator ==(Object other) =>

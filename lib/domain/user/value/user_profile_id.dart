@@ -8,7 +8,7 @@ class UserProfileId {
       throw Exception('User name must not be empty.');
     }
     if (value.length < 6 || value.length > 10) {
-      throw Exception('User name must be 6<= and <=10.');
+      throw Exception('UserProfileId must be 6<= and <=10.');
     }
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
       throw Exception('Only alphabet and underscores are allowed.');

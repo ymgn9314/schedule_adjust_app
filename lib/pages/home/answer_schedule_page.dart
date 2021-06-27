@@ -1,107 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:high_hat/controller/app_data_controller.dart';
-import 'package:high_hat/controller/schedule_data_controller.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:high_hat/common/helper/helpers.dart';
+import 'package:high_hat/domain/schedule/schedule.dart';
+import 'package:high_hat/domain/user/value/answer.dart';
 import 'package:high_hat/pages/home/view_answer_page.dart';
-import 'package:high_hat/util/custom_icons.dart';
-import 'package:intl/intl.dart';
+import 'package:high_hat/presentation/notifier/answer_notifier.dart';
+import 'package:high_hat/presentation/notifier/user_notifier.dart';
 import 'package:provider/provider.dart';
 
-class AnswerButtonComponent {
-  AnswerButtonComponent(this.assetName,
-      {this.isSelected = false, this.selectedColor});
-  bool isSelected = false;
-  final String assetName;
-  Color? selectedColor;
+class AnswerSelectComponent extends StatefulWidget {
+  AnswerSelectComponent({
+    Key? key,
+    required int selfIndex,
+    required int selected,
+    required bool isFix,
+  })  : _selfIndex = selfIndex,
+        _selected = selected,
+        _isFix = isFix,
+        super(key: key);
 
-  Widget get button {
-    return isSelected
-        ? customIcon(assetName, selectedColor, 28)
-        : customIcon(assetName, Colors.grey, 28);
-  }
+  final int _selfIndex;
+  int _selected = 0;
+  final bool _isFix;
+
+  @override
+  _AnswerSelectComponentState createState() => _AnswerSelectComponentState();
 }
 
-class CustomAnswerRadio extends StatelessWidget {
-  const CustomAnswerRadio(this._answerButton);
-  final AnswerButtonComponent _answerButton;
-
+class _AnswerSelectComponentState extends State<AnswerSelectComponent> {
   @override
   Widget build(BuildContext context) {
-    return _answerButton.button;
-  }
-}
+    // TODO(ymgn9314): フィールドとして持ちたい
+    final _customRadioAssetList = <Widget>[
+      SvgPicture.asset('assets/circle.svg',
+          color: Colors.grey, width: 32, height: 32),
+      SvgPicture.asset('assets/triangle.svg',
+          color: Colors.grey, width: 32, height: 32),
+      SvgPicture.asset('assets/cross.svg',
+          color: Colors.grey, width: 32, height: 32),
+      SvgPicture.asset('assets/circle.svg',
+          color: Theme.of(context).primaryColor, width: 32, height: 32),
+      SvgPicture.asset('assets/triangle.svg',
+          color: Theme.of(context).primaryColor, width: 32, height: 32),
+      SvgPicture.asset('assets/cross.svg',
+          color: Theme.of(context).primaryColor, width: 32, height: 32),
+    ];
 
-class AnswerSelector extends StatefulWidget {
-  AnswerSelector({
-    required this.docName, // answersコレクションのドキュメント名
-    required this.initialValue,
-    required this.isAnswer,
-    this.selectedColor,
-  });
-
-  final int initialValue;
-  final bool isAnswer;
-  String docName;
-  Color? selectedColor;
-
-  @override
-  _AnswerSelectorState createState() =>
-      _AnswerSelectorState(initialValue, docName, isAnswer,
-          selectedColor: selectedColor);
-}
-
-class _AnswerSelectorState extends State<AnswerSelector> {
-  _AnswerSelectorState(this._initialValue, this.docName, this.isAnswer,
-      {this.selectedColor});
-  final int _initialValue;
-  String docName;
-  final bool isAnswer;
-  Color? selectedColor;
-
-  final List<AnswerButtonComponent> _radio = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _radio
-      ..add(AnswerButtonComponent('assets/circle.svg',
-          isSelected: _initialValue == 0, selectedColor: selectedColor))
-      ..add(AnswerButtonComponent('assets/triangle.svg',
-          isSelected: _initialValue == 1, selectedColor: selectedColor))
-      ..add(AnswerButtonComponent('assets/cross.svg',
-          isSelected: _initialValue == 2, selectedColor: selectedColor));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      shrinkWrap: true,
-      primary: false,
-      itemCount: _radio.length,
-      itemBuilder: (context, index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12),
-          child: GestureDetector(
-            onTap: isAnswer
-                ? null
-                : () {
-                    setState(() {
-                      // firestoreに書き込む値を更新
-                      context
-                          .read<ScheduleDataController>()
-                          .schedules[docName] = index;
-
-                      for (var i = 0; i < _radio.length; i++) {
-                        _radio[i].isSelected = false;
-                      }
-                      _radio[index].isSelected = true;
-                    });
-                  },
-            child: CustomAnswerRadio(_radio[index]),
-          ),
-        );
-      },
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        for (int i = 0; i < _customRadioAssetList.length / 2; i++)
+          GestureDetector(
+              onTap: widget._isFix
+                  ? null
+                  : () {
+                      setState(() {
+                        widget._selected = i;
+                        context
+                            .read<AnswerNotifier>()
+                            .updateAnswer(widget._selfIndex, Answer.values[i]);
+                        // print(widget._selected);
+                      });
+                    },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                child: (widget._selected == i)
+                    ? _customRadioAssetList[i + 3]
+                    : _customRadioAssetList[i],
+              )),
+      ],
     );
   }
 }
@@ -109,110 +77,153 @@ class _AnswerSelectorState extends State<AnswerSelector> {
 class AnswerSchedulePage extends StatelessWidget {
   static const id = 'answer_schedule_page';
 
-  AnswerSchedulePage(this._scheduleId, this._answerNumber);
+  const AnswerSchedulePage({
+    Key? key,
+    required Schedule schedule,
+  })  : _schedule = schedule,
+        super(key: key);
 
-  // schedulesoコレクションのスケジュールID
-  final String _scheduleId;
-  // 回答済みの人数
-  final int _answerNumber;
-
+  final Schedule _schedule;
   @override
   Widget build(BuildContext context) {
-    print('AnswerSchedulePage#build()');
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          '回答する',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: FutureBuilder<bool>(
-        future: context
-            .read<ScheduleDataController>()
-            .fetchSchedule(context, _scheduleId),
-        builder: (context, snapshot) {
-          // 取得が完了していない
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                ElevatedButton(
+    return GestureDetector(
+      onTap: () {
+        final currentScope = FocusScope.of(context);
+        if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        }
+      },
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: Text(
+              '${_schedule.title.value}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Text('${_schedule.remarks.value}'),
+              ),
+              Container(
+                margin: const EdgeInsets.all(32),
+                height: 40,
+                child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: context.read<AppDataController>().color[600],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).push<void>(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ViewAnswerPage(_scheduleId, _answerNumber);
-                        },
+                    // 回答閲覧ページ画面に遷移
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (context) =>
+                            ViewAnswerPage(schedule: _schedule),
                       ),
                     );
                   },
                   child: const Text(
                     'みんなの回答をみる',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(fontSize: 15),
                   ),
                 ),
-                // 回答一覧
-                ...context.read<ScheduleDataController>().schedules.entries.map(
-                      (e) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              DateFormat('M/d(E)').format(
-                                  DateFormat('y-M-d').parseStrict(e.key)),
-                              style: const TextStyle(fontSize: 20),
-                            ),
-                            SizedBox(
-                              height: 48,
-                              child: AnswerSelector(
-                                initialValue: e.value,
-                                docName: e.key,
-                                isAnswer: context
-                                    .read<ScheduleDataController>()
-                                    .isAnswer,
-                                selectedColor: context
-                                    .read<AppDataController>()
-                                    .color[500],
-                              ),
-                            ),
-                          ],
+              ),
+              Flexible(
+                child: ListView.separated(
+                  itemBuilder: (BuildContext context, int index) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          Helpers.dateFormat
+                              .format(_schedule.scheduleList[index].value),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
+                        const SizedBox(width: 48),
+                        AnswerSelectComponent(
+                          selfIndex: index,
+                          selected: context
+                              .read<AnswerNotifier>()
+                              .answer[index]
+                              .index,
+                          isFix: context.read<AnswerNotifier>().isAlreadyAnswer,
+                        ),
+                      ],
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(height: 12);
+                  },
+                  itemCount: _schedule.scheduleList.length,
+                ),
+              ),
+              // コメント
+              if (!context.watch<AnswerNotifier>().isAlreadyAnswer)
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+                  child: TextFormField(
+                    maxLength: 50,
+                    maxLines: 3,
+                    keyboardType: TextInputType.multiline,
+                    autofocus: false,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    controller:
+                        context.read<AnswerNotifier>().commentController,
+                    decoration: InputDecoration(
+                      labelText: 'みんなにコメントを送る(任意)',
+                      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                ElevatedButton(
-                  onPressed: context.read<ScheduleDataController>().isAnswer
+                  ),
+                ),
+              Container(
+                margin: const EdgeInsets.all(32),
+                height: 40,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: context.watch<AnswerNotifier>().isAlreadyAnswer
                       ? null
                       : () async {
-                          // firestoreに回答を送信する
-                          await context
-                              .read<ScheduleDataController>()
-                              .sendAnswer(context, _scheduleId);
-
-                          // 画面を抜ける？
-                          Navigator.of(context).pop();
+                          final userNotifier = context.read<UserNotifier>();
+                          final answerNotifier = context.read<AnswerNotifier>();
+                          // 回答とコメントを送信する
+                          await userNotifier.answerToSchedule(
+                            _schedule.id.value,
+                            answerNotifier.answer,
+                            answerNotifier.comment,
+                          );
+                          answerNotifier.sendAnswer();
                         },
-                  child: context.read<ScheduleDataController>().isAnswer
-                      ? const Text(
-                          '回答済みです',
-                          style: TextStyle(color: Colors.white),
-                        )
-                      : const Text(
-                          '回答を送信する',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                  child: Text(
+                    context.watch<AnswerNotifier>().isAlreadyAnswer
+                        ? '回答済みです'
+                        : '回答を送信する',
+                    style: const TextStyle(fontSize: 15),
+                  ),
                 ),
-              ],
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

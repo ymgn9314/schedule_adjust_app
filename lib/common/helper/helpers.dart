@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:ntp/ntp.dart';
@@ -9,8 +10,20 @@ class Helpers {
   static Future<String> get dateId async =>
       DateFormat('yyyy-MM').format(await ntpTime ?? DateTime.now());
 
+  static DateFormat get dateFormat => DateFormat('yyyy/MM/dd(E)', 'ja_JP');
+
+  static DateFormat get dateFormatForId => DateFormat('yyyyMMddHms');
+
   static final _auth = FirebaseAuth.instance;
   static String? get userId => _auth.currentUser?.uid;
   static String? get photoUrl => _auth.currentUser?.photoURL;
   static String? get userName => _auth.currentUser?.displayName;
+
+  static String generateRandomString(int len) {
+    final random = Random();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[random.nextInt(_chars.length)])
+        .join();
+  }
 }

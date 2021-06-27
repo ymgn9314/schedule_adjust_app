@@ -10,5 +10,6 @@ abstract class ScheduleFactoryBase {
     required String remarks,
     required List<DateTime> scheduleList,
     required List<String> userList,
+    required List<String> answerUserList,
   });
 }

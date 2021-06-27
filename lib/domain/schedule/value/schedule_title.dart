@@ -4,11 +4,8 @@ import 'package:meta/meta.dart';
 @immutable
 class ScheduleTitle {
   ScheduleTitle(this.value) {
-    if (value.isEmpty) {
-      throw Exception('Schedule title must not be empty.');
-    }
-    if (value.length < 3 || value.length > 10) {
-      throw Exception('Schedule title length must be 3<= and <=10.');
+    if (value.length > 15) {
+      throw Exception('Schedule title length must be <=15.');
     }
   }
 

@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:high_hat/controller/login_authentication_controller.dart';
 import 'package:high_hat/pages/home/setting_page.dart';
+import 'package:high_hat/presentation/notifier/user_notifier.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatelessWidget {
@@ -10,94 +9,72 @@ class AccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('AccountPage#build()');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(
-              children: [
-                CircleAvatar(
-                  radius: 32,
-                  backgroundImage: NetworkImage(
-                    context
-                        .read<LoginAuthenticationController>()
-                        .user!
-                        .photoUrl,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  context
-                      .read<LoginAuthenticationController>()
-                      .user!
-                      .displayName,
-                  style: const TextStyle(
-                      fontSize: 32, fontWeight: FontWeight.bold),
-                ),
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(context
-                          .read<LoginAuthenticationController>()
-                          .user!
-                          .uid)
-                      .snapshots()
-                      .handleError(() {}),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return const Text(
-                        '不明なユーザーID',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.normal),
-                      );
-                    }
-                    if (!snapshot.hasData) {
-                      return const Text(
-                        '',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.normal),
-                      );
-                    }
-                    if (!snapshot.data!.exists) {
-                      return const Text(
-                        '不明なユーザーID',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.normal),
-                      );
-                    }
-                    return Text(
-                      snapshot.data!.get('userId') as String,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.normal),
-                    );
+        title: const Text(
+          'アカウント',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings, size: 32),
+            padding: const EdgeInsets.fromLTRB(0, 0, 32, 0),
+            onPressed: () {
+              Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return SettingPage();
                   },
                 ),
-              ],
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.8,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push<void>(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return SettingPage();
-                      },
+              );
+            },
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: CircleAvatar(
+                      radius: 32,
+                      backgroundImage: context.select(
+                        (UserNotifier notifier) => NetworkImage(
+                          notifier.loggedInUser?.avatarUrl.value ?? '',
+                        ),
+                      ),
                     ),
-                  );
-                },
-                child: const Text('設定',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  context.select(
+                    (UserNotifier notifier) => Text(
+                      notifier.loggedInUser!.userName.value,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  context.select(
+                    (UserNotifier notifier) => Text(
+                      notifier.loggedInUser!.userProfileId.value,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

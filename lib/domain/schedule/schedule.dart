@@ -13,11 +13,13 @@ class Schedule {
     required ScheduleRemarks remarks,
     required List<ScheduleDate> scheduleList,
     required List<UserId> userList,
+    required List<UserId> answerUserList,
   })  : _ownerUrl = ownerUrl,
         _title = title,
         _remarks = remarks,
         _scheduleList = scheduleList,
-        _userList = userList;
+        _userList = userList,
+        _answerUserList = answerUserList;
 
   // 識別子
   final ScheduleId id;
@@ -31,12 +33,15 @@ class Schedule {
   List<ScheduleDate> _scheduleList;
   // 参加者
   List<UserId> _userList;
+  // 回答済み参加者
+  List<UserId> _answerUserList;
 
   AvatarUrl get ownerUrl => _ownerUrl;
   ScheduleTitle get title => _title;
   ScheduleRemarks get remarks => _remarks;
   List<ScheduleDate> get scheduleList => _scheduleList;
   List<UserId> get userList => _userList;
+  List<UserId> get answerUserList => _answerUserList;
 
   @override
   bool operator ==(Object other) =>

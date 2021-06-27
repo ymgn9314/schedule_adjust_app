@@ -16,6 +16,7 @@ class ScheduleFactory implements ScheduleFactoryBase {
     required String remarks,
     required List<DateTime> scheduleList,
     required List<String> userList,
+    required List<String> answerUserList,
   }) {
     return Schedule(
       id: ScheduleId(id),
@@ -24,6 +25,7 @@ class ScheduleFactory implements ScheduleFactoryBase {
       remarks: ScheduleRemarks(remarks),
       scheduleList: scheduleList.map((e) => ScheduleDate(e)).toList(),
       userList: userList.map((e) => UserId(e)).toList(),
+      answerUserList: answerUserList.map((e) => UserId(e)).toList(),
     );
   }
 }
