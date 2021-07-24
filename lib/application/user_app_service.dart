@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:high_hat/domain/schedule/value/schedule_id.dart';
 import 'package:high_hat/domain/user/user.dart';
@@ -143,7 +144,7 @@ class UserAppService {
       final twitterLogin = TwitterLogin(
         apiKey: 'Gv0F0jj584IpTnU1ar1bOarY8',
         apiSecretKey: '8Xomm3tsvvY7Dz49C1bTLjbH55nf1to0xsDWHsiuRKyh8ONA3W',
-        redirectURI: 'schedule-app://',
+        redirectURI: kReleaseMode ? 'schedule-app://' : 'schedule-app-dev://',
       );
 
       final authResult = await twitterLogin.login();

@@ -4,9 +4,9 @@ import 'package:meta/meta.dart';
 @immutable
 class AvatarUrl {
   AvatarUrl(this.value) {
-    if (value.isEmpty) {
-      throw Exception('AvatarUrl must not be empty.');
-    }
+    // if (value.isEmpty) {
+    //   throw Exception('AvatarUrl must not be empty.');
+    // }
     // TODO(ymgn9314): 有効なURLかチェック
   }
 

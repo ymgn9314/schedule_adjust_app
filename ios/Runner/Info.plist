@@ -35,6 +35,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>schedule-app</string>
+				<string>schedule-app-dev</string>
 			</array>
 		</dict>
 	</array>

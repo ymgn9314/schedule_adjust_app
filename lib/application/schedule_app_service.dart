@@ -88,7 +88,7 @@ class ScheduleAppService {
     );
 
     // ユーザーごとの回答を取得する
-    int validAnswerNumber = 0;
+    var validAnswerNumber = 0;
     for (var ui = 0; ui < schedule.answerUserList.length; ++ui) {
       final userId = schedule.answerUserList[ui];
       final user = await _userRepository.findByUserId(userId);

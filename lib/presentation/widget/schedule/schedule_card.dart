@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:high_hat/common/helper/helpers.dart';
 import 'package:high_hat/domain/schedule/schedule.dart';
 import 'package:high_hat/domain/user/value/user_id.dart';
-import 'package:high_hat/pages/home/answer_schedule_page.dart';
+import 'package:high_hat/presentation/pages/home/schedule/answer_schedule_page.dart';
 import 'package:high_hat/presentation/notifier/answer_notifier.dart';
 import 'package:high_hat/presentation/notifier/schedule_notifier.dart';
 import 'package:high_hat/presentation/notifier/user_notifier.dart';

@@ -34,11 +34,9 @@ class RegisterScheduleNotifier with ChangeNotifier {
   void onDaySelected(DateTime selectedDay) {
     final target = ScheduleDate(selectedDay);
 
-    if (_selectedDays.contains(target)) {
-      _selectedDays.remove(target);
-    } else {
-      _selectedDays.add(target);
-    }
+    _selectedDays.contains(target)
+        ? _selectedDays.remove(target)
+        : _selectedDays.add(target);
 
     // 日付をソートする
     _selectedDays.sort((lhs, rhs) => lhs.value.compareTo(rhs.value));
@@ -48,12 +46,24 @@ class RegisterScheduleNotifier with ChangeNotifier {
 
   // ユーザーの選択・非選択を切り替える
   void onUserSelected(User user) {
-    if (_selectedUsers.contains(user)) {
-      _selectedUsers.remove(user);
-    } else {
-      _selectedUsers.add(user);
-    }
+    _selectedUsers.contains(user)
+        ? _selectedUsers.remove(user)
+        : _selectedUsers.add(user);
 
     notifyListeners();
+  }
+
+  String? validate() {
+    // タイトルが入力されていない
+    if (title.isEmpty) {
+      return 'タイトルが未設定です.';
+    }
+    if (_selectedUsers.isEmpty) {
+      return '友達が選択されていません.';
+    }
+    if (_selectedDays.isEmpty) {
+      return '日付が選択されていません.';
+    }
+    return null;
   }
 }

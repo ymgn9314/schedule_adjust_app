@@ -52,3 +52,7 @@ android/app/src/release/google-services.json
 
 # FVM
 .fvm/flutter_sdk
+
+# cocoapods
+ios/vendor
+ios/.bundle

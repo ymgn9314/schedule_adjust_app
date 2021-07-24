@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ntp/ntp.dart';
 
@@ -25,5 +26,29 @@ class Helpers {
         'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
     return List.generate(len, (index) => _chars[random.nextInt(_chars.length)])
         .join();
+  }
+
+  static ThemeData defaultThemeData() {
+    return ThemeData(
+      brightness: Brightness.light,
+      primarySwatch: Colors.green,
+      primaryColor: Colors.green[600],
+      primaryColorBrightness: Brightness.light,
+      accentColor: Colors.green[400],
+      accentColorBrightness: Brightness.light,
+      buttonColor: Colors.green[500],
+    );
+  }
+
+  static ThemeData defaultDarkThemeData() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      primarySwatch: Colors.green,
+      primaryColor: Colors.green[600],
+      primaryColorBrightness: Brightness.dark,
+      accentColor: Colors.green[400],
+      accentColorBrightness: Brightness.dark,
+      buttonColor: Colors.green[500],
+    );
   }
 }

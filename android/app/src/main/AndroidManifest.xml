@@ -39,6 +39,8 @@
                 <!-- Registered Callback URLs in TwitterApp -->
                 <data android:scheme="schedule-app"
                       android:host="" /> <!-- host is option -->
+                <data android:scheme="schedule-app-dev"
+                      android:host="" /> <!-- host is option -->
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
