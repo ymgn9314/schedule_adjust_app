@@ -28,8 +28,9 @@ class UserRepository implements UserRepositoryBase {
 // Firestoreからユーザー追加/削除(ユーザー登録、退会時)
   @override
   Future<void> create(User user) async {
+    print('public/user/user_v1/$_userId');
     // public
-    await _db.doc('public/user/user_v1/${user.id.value}').set(
+    await _db.doc('public/user/user_v1/$_userId').set(
       <String, dynamic>{
         'displayName': user.userName.value,
         'photoUrl': user.avatarUrl.value,
@@ -40,7 +41,7 @@ class UserRepository implements UserRepositoryBase {
     );
 
     // private
-    await _db.doc('private/user/user_v1/${user.id.value}').set(
+    await _db.doc('private/user/user_v1/$_userId').set(
       <String, dynamic>{
         'friendList': FieldValue.arrayUnion(
           user.userFriend.map((e) => e.value).toList(),
@@ -106,7 +107,7 @@ class UserRepository implements UserRepositoryBase {
       final _avatarUrl = pubData['photoUrl'] as String;
       final _userFriend = priData['friendList'] as List<dynamic>;
 
-      // TODO(ymgn): もっと綺麗な書き方分かったら修正
+      // TODO(ymgn9314): もっと綺麗な書き方分かったら修正
       final _answersToSchedule = <ScheduleId, List<Answer>>{};
       ((pubData['schedule'] ?? <String, dynamic>{}) as Map<String, dynamic>)
           .cast<String, List<dynamic>>()
@@ -224,17 +225,15 @@ class UserRepository implements UserRepositoryBase {
     List<Answer> answerList,
     UserComment comment,
   ) async {
-    final userId = Helpers.userId ?? '';
-
     // 回答を更新
-    await _db.doc('public/user/user_v1/$userId').update(
+    await _db.doc('public/user/user_v1/$_userId').update(
       <String, dynamic>{
         'schedule.${id.value}': answerList.map((e) => e.index).toList(),
       },
     );
 
     // コメントを保存
-    await _db.doc('public/user/user_v1/$userId').set(
+    await _db.doc('public/user/user_v1/$_userId').set(
       <String, dynamic>{
         'comment': <String, dynamic>{
           id.value: comment.value,
@@ -246,7 +245,7 @@ class UserRepository implements UserRepositoryBase {
     // 回答済みユーザーリストに追加
     await _db.doc('public/schedule/schedule_v1/${id.value}').update(
       <String, dynamic>{
-        'answerUserList': FieldValue.arrayUnion(<String>[userId]),
+        'answerUserList': FieldValue.arrayUnion(<String>[_userId]),
       },
     );
   }

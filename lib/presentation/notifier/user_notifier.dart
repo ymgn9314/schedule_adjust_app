@@ -27,7 +27,7 @@ class UserNotifier with ChangeNotifier {
       final _id = FirebaseAuth.instance.currentUser!.uid;
       _loggedInUser = await _service.searchByUserId(UserId(_id));
 
-      // TODO(ymgn): 前バージョンで既に使っているユーザー用
+      // TODO(ymgn9314): 前バージョンで既に使っているユーザー用
       // 新バージョンはFirestoreのデータ構造が変わっているため、
       // ユーザー情報がそっちに作成されていなければ作成する
       if (_loggedInUser == null) {
@@ -88,7 +88,7 @@ class UserNotifier with ChangeNotifier {
 
   void notifySignOut() {
     FirebaseAuth.instance.signOut();
-    _loggedInUser = null;
+    // _loggedInUser = null;
     notifyListeners();
   }
 

@@ -30,11 +30,12 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<UserRepositoryBase>(create: (context) => UserRepository()),
         ChangeNotifierProvider<UserNotifier>(
           create: (context) => UserNotifier(
             service: UserAppService(
               userFactory: UserFactory(),
-              userRepository: UserRepository(),
+              userRepository: context.read<UserRepositoryBase>(),
             ),
           ),
         ),
@@ -43,7 +44,7 @@ Future<void> main() async {
             service: ScheduleAppService(
               scheduleFactory: ScheduleFactory(),
               scheduleRepository: ScheduleRepository(),
-              userRepository: UserRepository(),
+              userRepository: context.read<UserRepositoryBase>(),
             ),
           ),
         ),
